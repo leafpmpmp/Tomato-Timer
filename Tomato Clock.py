@@ -4,8 +4,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 
 button_state = 0
-time_state = 1
-count = 1790
+time_state = 0
+count = 0
 current_time = "00:00"
 
 class Window(QWidget):
