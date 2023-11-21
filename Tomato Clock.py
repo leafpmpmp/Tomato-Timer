@@ -5,6 +5,7 @@ from PyQt5.QtCore import *
 
 scale = 1.25
 adaptive_scale = 1.5
+on_top = True
 
 button_state = 0
 time_state = 0
@@ -28,6 +29,7 @@ class Window(QWidget):
         self.scaleM = QRadioButton("Medium", self)
         self.scaleS = QRadioButton("Small", self)
         self.slider = QSlider(self)
+        self.check = QCheckBox("On Top", self)
 
         self.scaleM.setChecked(True)
         self.slider.setRange(10, 25)
@@ -42,6 +44,7 @@ class Window(QWidget):
         self.scaleM.clicked.connect(self.onMediumClick)
         self.scaleS.clicked.connect(self.onSmallClick)
         self.slider.valueChanged.connect(self.onSliderAdjusted)
+        self.check.clicked.connect(self.onClick)
 
     def scaleUI(self):
         self.setGeometry(int(300*scale), int(300*scale), int(400*scale), int(600*scale))
@@ -80,6 +83,15 @@ class Window(QWidget):
         qp.drawArc(QRect(int(200*scale - 76*adaptive_scale), int(7 + 50*adaptive_scale + 50*scale), int(152*adaptive_scale), int(152*adaptive_scale)), 0, 360*16)
         qp.end()
 
+    def onClick(self):
+        global on_top
+        if(self.check.isChecked()):
+            self.setWindowFlag(Qt.WindowStaysOnTopHint, True)
+            self.show()
+        else:
+            self.setWindowFlag(Qt.WindowStaysOnTopHint, False)
+            self.show()
+    
     def onStartClick(self): # START/STOP button
         global button_state
         if(button_state == 0):
@@ -133,6 +145,7 @@ class Window(QWidget):
 
 app = QApplication(sys.argv)
 window = Window()
+window.setWindowFlag(Qt.WindowStaysOnTopHint)
 window.show()
 
 def tic(): # counter
