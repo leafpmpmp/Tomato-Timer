@@ -1,5 +1,5 @@
-# Tomato-Clock
-A simple tomato clock, now with a scalable UI.
+# Tomato-Timer
+A simple tomato timer, now with a new UI under construction.
 ## Requirements
 Python
 ```
