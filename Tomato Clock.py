@@ -9,41 +9,34 @@ on_top = True
 
 button_state = 0
 time_state = 0
-count = 0
-current_time = "00:00"
+count = 1800
+current_time = "25:00"
 
 class Window(QWidget):
     def __init__(self):
         super().__init__()
         self.initUI()
         self.scaleUI()
+        #self.showScale()
 
     def initUI(self):
-        self.setWindowTitle("Tomato Clock")
+        self.setWindowTitle("Tomato Timer")
 
-        self.title = QLabel("Tomato Clock", self)
-        self.time = QLabel("00:00", self)
+        self.shadow = QLabel("Tomato Timer", self)
+        self.title = QLabel("Tomato Timer", self)
+        self.time = QLabel("25:00", self)
         self.start = QPushButton("START", self)
         self.reset = QPushButton("RESET", self)
-        self.scaleL = QRadioButton("Large", self)
-        self.scaleM = QRadioButton("Medium", self)
-        self.scaleS = QRadioButton("Small", self)
-        self.slider = QSlider(self)
         self.check = QCheckBox("On Top", self)
-
-        self.scaleM.setChecked(True)
-        self.slider.setRange(10, 25)
-        self.slider.setOrientation(1)
-        self.slider.setTickPosition(2)
-        self.slider.setTickInterval(1)
-        self.slider.setValue(15)
+        self.check.setChecked(True)
+        self.setWindowFlag(Qt.WindowStaysOnTopHint, True)
+        
+        self.start.setStyleSheet('QPushButton {background-color: #00CC66; border: none} QPushButton:hover {background-color: #00B359} QPushButton:pressed {background-color: #00b359}')
+        self.reset.setStyleSheet('QPushButton {background-color: #00CC66; border: none} QPushButton:hover {background-color: #00B359} QPushButton:pressed {background-color: #00b359}')
+        self.check.setStyleSheet('QCheckBox::indicator {background: transparent; border: 1px solid #00CC66} QCheckBox::indicator:checked {background: transparent; background-color: #00CC66}')
 
         self.start.clicked.connect(self.onStartClick)
         self.reset.clicked.connect(self.onResetClick)
-        self.scaleL.clicked.connect(self.onLargeClick)
-        self.scaleM.clicked.connect(self.onMediumClick)
-        self.scaleS.clicked.connect(self.onSmallClick)
-        self.slider.valueChanged.connect(self.onSliderAdjusted)
         self.check.clicked.connect(self.onClick)
 
     def scaleUI(self):
@@ -51,6 +44,10 @@ class Window(QWidget):
         self.title.setGeometry(int(200*scale - 100*adaptive_scale), 10, int(200*adaptive_scale), int(50*adaptive_scale))
         self.title.setAlignment(Qt.AlignCenter)
         self.title.setFont(QFont("Arial", int(16*adaptive_scale)))
+        self.shadow.setGeometry(int(200*scale - 100*adaptive_scale) + 2, 12, int(200*adaptive_scale), int(50*adaptive_scale))
+        self.shadow.setAlignment(Qt.AlignCenter)
+        self.shadow.setFont(QFont("Arial", int(16*adaptive_scale)))
+        self.shadow.setStyleSheet('QLabel {color: #333333}')
 
         self.time.setGeometry(int(200*scale - 25*adaptive_scale), int(10 + 200*adaptive_scale + 105*scale), int(50*adaptive_scale), int(25*adaptive_scale))
         self.time.setAlignment(Qt.AlignCenter)
@@ -62,6 +59,21 @@ class Window(QWidget):
         self.reset.setGeometry(int(200*scale - 30*adaptive_scale), int(10 + 255*adaptive_scale + 150*scale), int(60*adaptive_scale), int(25*adaptive_scale))
         self.start.setFont(QFont("Arial", int(7*adaptive_scale)))
 
+    def showScale(self): # Scaling settings
+        self.scaleL = QRadioButton("Large", self)
+        self.scaleM = QRadioButton("Medium", self)
+        self.scaleS = QRadioButton("Small", self)
+        self.slider = QSlider(self)
+        self.scaleM.setChecked(True)
+        self.slider.setRange(10, 25)
+        self.slider.setOrientation(1)
+        self.slider.setTickPosition(2)
+        self.slider.setTickInterval(1)
+        self.slider.setValue(15)
+        self.scaleL.clicked.connect(self.onLargeClick)
+        self.scaleM.clicked.connect(self.onMediumClick)
+        self.scaleS.clicked.connect(self.onSmallClick)
+        self.slider.valueChanged.connect(self.onSliderAdjusted)
         self.scaleL.setGeometry(int(100*scale - 20*adaptive_scale), int(10 + 280*adaptive_scale + 180*scale), int(90*adaptive_scale), int(25*adaptive_scale))
         self.scaleM.setGeometry(int(200*scale - 20*adaptive_scale), int(10 + 280*adaptive_scale + 180*scale), int(90*adaptive_scale), int(25*adaptive_scale))
         self.scaleS.setGeometry(int(300*scale - 20*adaptive_scale), int(10 + 280*adaptive_scale + 180*scale), int(90*adaptive_scale), int(25*adaptive_scale))
@@ -72,6 +84,8 @@ class Window(QWidget):
         qp = QPainter()
         qp.begin(self)
         
+        qp.setPen(QPen(QColor("#CC2900"), 3*adaptive_scale))
+        qp.drawArc(QRect(int(200*scale - 76*adaptive_scale) + 3, int(7 + 50*adaptive_scale + 50*scale) + 3, int(152*adaptive_scale), int(152*adaptive_scale)), 0, 360*16)
         if(time_state == 0):
             qp.setBrush(Qt.red)
             qp.setPen(QPen(QColor("#ff0000"), 3))
@@ -79,7 +93,7 @@ class Window(QWidget):
             qp.setBrush(Qt.cyan)
             qp.setPen(QPen(QColor("#00ffff"), 3))
         qp.drawPie(QRect(int(200*scale - 75*adaptive_scale), int(10 + 50*adaptive_scale + 50*scale), int(150*adaptive_scale), int(150*adaptive_scale)), 90*16, int(alen))
-        qp.setPen(QPen(QColor("#000000"), 3*adaptive_scale))
+        qp.setPen(QPen(QColor("#FF3300"), 3*adaptive_scale))
         qp.drawArc(QRect(int(200*scale - 76*adaptive_scale), int(7 + 50*adaptive_scale + 50*scale), int(152*adaptive_scale), int(152*adaptive_scale)), 0, 360*16)
         qp.end()
 
@@ -148,13 +162,18 @@ window = Window()
 window.setWindowFlag(Qt.WindowStaysOnTopHint)
 window.show()
 
+w = QWidget()
+bg = w.palette()
+bg.setColor(w.backgroundRole(), QColor(247, 156, 156))
+window.setPalette(bg)
+
 def tic(): # counter
     global count, time_state
-    count += 1
+    count -= 1
     calcTime()
-    if(count == 1500):
+    if(count == 300):
         time_state = 1
-    elif(count == 1800):
+    elif(count == 0):
         timer.stop()
         rstTimer.start(1)
     window.update()
@@ -162,12 +181,13 @@ def tic(): # counter
 
 def calcTime(): # Time format convter
     global current_time, time_state
-    m = int(count / 60) - time_state*25
+    time = count - 300
+    m = int(time / 60) + time_state*4
     if(m < 10):
         M = '0' + str(m)
     else:
         M = str(m)
-    s = count % 60
+    s = time % 60
     if(s < 10):
         S = '0' + str(s)
     else:
@@ -176,16 +196,19 @@ def calcTime(): # Time format convter
 
 def reset(): # Timer reset
     global count, time_state
-    count -= 1
     calcTime()
+    
     window.time.setText(current_time)
     window.update()
-    if(count == 1500 or count == 1499): # To prevent that time_state is not set to 0 if reset is pressed when count = 1500
+    if(count == 300):
         time_state = 0
-    if(count == 0):
+    if(count == 1800):
+        count -= 1
         rstTimer.stop()
         if(button_state == 1):
             timer.start(1000)
+    count += 1
+        
 
 timer = QTimer()
 timer.timeout.connect(tic)
