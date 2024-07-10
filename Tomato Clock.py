@@ -25,7 +25,7 @@ class Window(QWidget):
         self.shadow = QLabel("Tomato Timer", self)
         self.shadow.hide()
         self.tomato = QLabel(self)
-        self.tomato.setPixmap(QPixmap("img/tomato_stem.png"))
+        #self.tomato.setPixmap(QPixmap("img/tomato_stem.png"))
         self.title = QLabel("Tomato Timer", self)
         self.time = QLabel("25:00", self)
         self.start = QPushButton("START", self)
@@ -89,19 +89,27 @@ class Window(QWidget):
         alen = -1*count*0.2*16
         qp = QPainter()
         qp.begin(self)
-        
-        qp.setPen(QPen(QColor("#CC2900"), 3*adaptive_scale))
-        #qp.drawArc(QRect(int(200*scale - 76*adaptive_scale) + 3, int(7 + 50*adaptive_scale + 50*scale) + 3, int(152*adaptive_scale), int(152*adaptive_scale)), 0, 360*16)
+        qp.drawPixmap(int(200*scale - 75*adaptive_scale), int(8 + 50*adaptive_scale + 50*scale), int(151*adaptive_scale), int(151*adaptive_scale), QPixmap("img/tomato_slice.png"))
+
         if(time_state == 0):
-            qp.setBrush(Qt.red)
-            qp.setPen(QPen(QColor("#ff0000"), 3))
+            tomato_image = QImage("img/tomato_peel.png").scaled(int(150*adaptive_scale), int(150*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            brush = QBrush(tomato_image)
+            # Calculate the top-left corner of where the pie will be drawn
+            pie_x = int(200*scale - 75*adaptive_scale)
+            pie_y = int(10 + 50*adaptive_scale + 50*scale)
+            # Adjust the brush transformation
+            brush_transformation = QTransform()
+            brush_transformation.translate(pie_x, pie_y)
+            brush.setTransform(brush_transformation)
+            qp.setBrush(brush)
+            qp.setPen(Qt.NoPen)
         else:
             qp.setBrush(Qt.cyan)
-            qp.setPen(QPen(QColor("#00ffff"), 3))
+            qp.setPen(Qt.NoPen)
         # drawing the timer circle
         qp.drawPie(QRect(int(200*scale - 75*adaptive_scale), int(10 + 50*adaptive_scale + 50*scale), int(150*adaptive_scale), int(150*adaptive_scale)), 90*16, int(alen))
         qp.setPen(QPen(QColor("#FF3300"), 3*adaptive_scale))
-        qp.drawArc(QRect(int(200*scale - 76*adaptive_scale), int(7 + 50*adaptive_scale + 50*scale), int(152*adaptive_scale), int(152*adaptive_scale)), 0, 360*16)
+        #qp.drawArc(QRect(int(200*scale - 76*adaptive_scale), int(7 + 50*adaptive_scale + 50*scale), int(152*adaptive_scale), int(152*adaptive_scale)), 0, 360*16)
         qp.end()
 
     def onClick(self):
