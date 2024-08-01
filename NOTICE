@@ -1,0 +1,29 @@
+Tomato Timer
+============
+Copyright (c) 2023-2024 Morikon Tsai
+
+Used under the terms of the GNU General Public License version 3. The license
+text can be found in the LICENSE file.
+
+PyQt5
+=====
+URL: https://riverbankcomputing.com/software/pyqt/intro
+Version: 5.9.2
+
+Used under the terms of the GNU General Public License version 3. The license
+text can be found in the LICENSE file.
+
+Qt
+==
+URL: https://www.qt.io
+Version: 5
+
+Used under the terms of the GNU Lesser General Public License version 3.
+A copy of the license is available at http://www.gnu.org/.
+
+TearsFont
+=========
+URL: https://justfont.com/tearsfont/
+Version: 1.0
+
+Used under the terms of commercial license.

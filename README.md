@@ -1,5 +1,5 @@
 # Tomato-Timer
-A simple tomato timer, now with a new UI under construction.
+A simple tomato timer, now with a new UI under construction. (No ETA, but hopefully before Sep.)
 ## Requirements
 Python
 ```
@@ -10,6 +10,6 @@ PyQt5
 pip install PyQt5
 ```
 ## Run
-Just run it with python. If you don't want to see the console window, rename the file ```*.py``` to ```*.pyw``` before executing it.
+Just run it with `python "path/to/the/Tomato-Timer.py"`. If you don't want to see the console window, rename the file ```*.py``` to ```*.pyw``` before executing it.
 ## Screenshots
 <img src="https://github.com/leafpmpmp/Tomato-Clock/blob/main/src/screenshot1.png" width="300" />
