@@ -11,7 +11,7 @@ button_state = 0
 time_state = 0
 settings_state = 0
 rotation = 0
-count = 350
+count = 1800
 width = 400
 height = 700
 bg_color = "#fad8d8"
@@ -22,7 +22,6 @@ class Window(QWidget):
         super().__init__()
         self.initUI()
         self.scaleUI()
-        #self.showScale()
         self.updateScale()
         self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint)
 
@@ -34,7 +33,13 @@ class Window(QWidget):
     
     def initUI(self):
         self.setWindowTitle("Tomato Timer")
-        self.setGeometry(int(300*scale), int(300*scale), int(400*scale), int(600*scale))
+        self.setGeometry(int(300*scale), int(300*scale), int(width*scale), int(height*scale))
+        self.setStyleSheet("border-radius: 10px;")
+        #remove frame
+        self.setWindowFlag(Qt.FramelessWindowHint)
+        #make the main window transparent
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        
         self.tomato = QLabel(self)
         #self.tomato.setPixmap(QPixmap("img/tomato_stem.png"))
         self.title = QLabel(self)
@@ -50,6 +55,9 @@ class Window(QWidget):
         self.check.setChecked(True)
         self.settings = QPushButton("", self)
         self.rotate = QVariantAnimation(self)
+        self.expand = QPropertyAnimation(self, b"size")
+        #self.group = QParallelAnimationGroup(self)
+
         self.setWindowFlag(Qt.WindowStaysOnTopHint, True)
         
         self.start.setStyleSheet('QPushButton {background-color: #00CC66; border: none; border-radius: 10px} QPushButton:hover {background-color: #00B359} QPushButton:pressed {background-color: #00c161}')
@@ -62,15 +70,20 @@ class Window(QWidget):
         self.check.clicked.connect(self.onClick)
         self.settings.clicked.connect(self.showSettings)
 
-        self.rotate.setStartValue(360)
-        self.rotate.setEndValue(0)
         self.rotate.setDuration(500)
         self.rotate.setEasingCurve(QEasingCurve.OutQuad)
         self.rotate.valueChanged.connect(self.updateIcon)
+        self.rotate.setStartValue(360)
+        self.rotate.setEndValue(0)
 
-        self.scaleL = QRadioButton("Large", self)
-        self.scaleM = QRadioButton("Medium", self)
-        self.scaleS = QRadioButton("Small", self)
+        self.expand.setDuration(500)
+        self.expand.setEasingCurve(QEasingCurve.OutQuad)
+        self.expand.setStartValue(height*scale)
+        self.expand.setEndValue(height*scale + 200)
+
+        self.scaleL = QRadioButton("", self)
+        self.scaleM = QRadioButton("", self)
+        self.scaleS = QRadioButton("", self)
         self.slider = QSlider(self)
         self.scaleM.setChecked(True)
         self.slider.setRange(12, 18)
@@ -82,12 +95,20 @@ class Window(QWidget):
         self.scaleM.clicked.connect(self.onMediumClick)
         self.scaleS.clicked.connect(self.onSmallClick)
         self.slider.valueChanged.connect(self.onSliderAdjusted)
+
+        self.scaleL.setIcon(QIcon("img/large.png"))
+        self.scaleM.setIcon(QIcon("img/medium.png"))
+        self.scaleS.setIcon(QIcon("img/small.png"))
+        self.scaleL.setIconSize(QSize(135, 30))
+        self.scaleM.setIconSize(QSize(135, 30))
+        self.scaleS.setIconSize(QSize(135, 30))
+        self.settings.setGeometry(int(width*scale - 40), int(height*scale - 40), 30, 30)
         
         self.shortcut = QShortcut(QKeySequence("Space"), self)
         self.shortcut.activated.connect(self.onStartClick)
 
     def scaleUI(self):
-        self.setFixedSize(int(width*scale), int(height*scale))
+        self.setBaseSize(int(width*scale), int(height*scale))
         self.title.setGeometry(int(200*scale - 100*adaptive_scale), 20, int(200*adaptive_scale), int(50*adaptive_scale))
         self.title.setPixmap(QPixmap("img/title.png").scaled(int(200*adaptive_scale), int(50*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
         self.title.setAlignment(Qt.AlignCenter)
@@ -109,7 +130,7 @@ class Window(QWidget):
 
         self.check.setIcon(QIcon("img/on_top.png"))
         self.check.setIconSize(QSize(150, 30))
-        self.check.setGeometry(int(200*scale - 75), int(height*scale - 120), 150, 30)
+        self.check.setGeometry(int(200*scale - 75), int(height*scale + 40), 150, 30)
 
         self.start.setGeometry(int(200*scale - 50*adaptive_scale), int(20 + 225*adaptive_scale + 140*scale), int(100*adaptive_scale), int(30*adaptive_scale))
         self.start.setIcon(QIcon("img/start.png"))
@@ -119,12 +140,6 @@ class Window(QWidget):
         self.reset.setIcon(QIcon("img/reset.png"))
         self.reset.setIconSize(QSize(int(100*adaptive_scale), int(30*adaptive_scale)))
 
-        self.scaleL.hide()
-        self.scaleM.hide()
-        self.scaleS.hide()
-        self.slider.hide()
-        self.check.hide()
-        self.settings.setGeometry(int(width*scale - 40), int(height*scale - 40), 30, 30)
         #self.settings.setIcon(QIcon("img/settings.png"))
         #self.settings.setIconSize(QSize(30, 30))
     
@@ -136,28 +151,36 @@ class Window(QWidget):
     
     def showSettings(self): # Scaling settings
         global settings_state, rotation
-        if(rotation == 0):
-            if(settings_state == 0):
-                self.scaleL.show()
-                self.scaleM.show()
-                self.scaleS.show()
-                self.slider.show()
-                self.check.show()
-                settings_state = 1
-            else:
-                self.scaleL.hide()
-                self.scaleM.hide()
-                self.scaleS.hide()
-                self.slider.hide()
-                self.check.hide()
-                settings_state = 0
-            self.rotate.start()
+        print(rotation)
+        startpos = self.size()
+        self.rotate.stop()
+        self.expand.stop()
+        if(settings_state == 0):
+            newpos = QSize(int(width*scale), int(height*scale + 200))
+            self.expand.setStartValue(startpos)
+            self.expand.setEndValue(newpos)
+            self.rotate.setStartValue(rotation)
+            self.rotate.setEndValue(0)
+            settings_state = 1
+        else:
+            newpos = QSize(int(width*scale), int(height*scale))
+            self.expand.setStartValue(startpos)
+            self.expand.setEndValue(newpos)
+            self.rotate.setStartValue(rotation)
+            self.rotate.setEndValue(360)
+            settings_state = 0
+        self.rotate.start()
+        self.expand.start()
+        print(self.geometry().height(), newpos.height())
         
     def paintEvent(self, event):
         alen = -1*(count-300)*0.24*16
         qp = QPainter()
         qp.begin(self)
         qp.drawPixmap(int(200*scale - 75*adaptive_scale), int(19 + 50*adaptive_scale + 50*scale), int(151*adaptive_scale), int(151*adaptive_scale), QPixmap("img/tomato_slice.png"))
+        qp.setBrush(QColor("#fad8d8"))
+        qp.setPen(Qt.NoPen)
+        qp.drawRoundedRect(QRect(0, 0, self.size().width(), self.size().height()), 10, 10)
 
         if(time_state == 0):
             tomato_image = QImage("img/tomato_peel.png").scaled(int(150*adaptive_scale), int(150*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation)
@@ -187,7 +210,7 @@ class Window(QWidget):
         st.drawPixmap(-15, -15, 30, 30, QPixmap("img/settings.png").scaled(30, 30, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         st.end()
 
-    def onClick(self):
+    def onClick(self): # Always on top checkbox
         global on_top
         if(self.check.isChecked()):
             self.setWindowFlag(Qt.WindowStaysOnTopHint, True)
@@ -271,10 +294,10 @@ class Window(QWidget):
         self.updateClock(M, S)
 
     def updateScale(self):
-        self.scaleL.setGeometry(int(200*scale - 180), int(height*scale - 80), 135, 30)
-        self.scaleM.setGeometry(int(200*scale - 45), int(height*scale - 80), 135, 30)
-        self.scaleS.setGeometry(int(200*scale + 90), int(height*scale - 80), 135, 30)
-        self.slider.setGeometry(int(200*scale - 100), int(height*scale - 40), 200, 30)
+        self.scaleL.setGeometry(int(200*scale - 180), int(height*scale + 80), 135, 30)
+        self.scaleM.setGeometry(int(200*scale - 45), int(height*scale + 80), 135, 30)
+        self.scaleS.setGeometry(int(200*scale + 90), int(height*scale + 80), 135, 30)
+        self.slider.setGeometry(int(200*scale - 100), int(height*scale + 120), 200, 30)
         self.calcTime()
     
     def Scale(self):
@@ -288,12 +311,12 @@ class Bar(QWidget):
         super().__init__(parent)
         self.setAutoFillBackground(True)
         
-        #self.setBackgroundRole(QPalette.Shadow)
+        """ self.setBackgroundRole(QPalette.Shadow)
         # alternatively:
-        # palette = self.palette()
-        # palette.setColor(palette.Window, Qt.black)
-        # palette.setColor(palette.WindowText, Qt.white)
-        # self.setPalette(palette)
+        palette = self.palette()
+        palette.setColor(palette.Window, Qt.black)
+        palette.setColor(palette.WindowText, Qt.white)
+        self.setPalette(palette) """
 
         layout = QHBoxLayout(self)
         layout.setContentsMargins(1, 1, 1, 1)
@@ -318,7 +341,6 @@ class Bar(QWidget):
                 'SP_TitleBar{}Button'.format(target.capitalize()))
             btn.setIcon(style.standardIcon(iconType))
 
-            """"""
             if target == 'close':
                 colorNormal = bg_color
                 colorHover = 'red'
