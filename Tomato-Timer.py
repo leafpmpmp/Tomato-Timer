@@ -237,6 +237,7 @@ class Window(QWidget):
             count = 1
             tic()
         else:
+            timer.stop()
             rstTimer.start(1)
 
     def onLargeClick(self): # Window scale buttons
