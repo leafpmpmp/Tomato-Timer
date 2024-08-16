@@ -1,11 +1,10 @@
-import sys
+import sys, time
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 
 scale = 1.25
 adaptive_scale = 1.5
-on_top = True
 QT_SCALE_FACTOR = 3
 button_state = 0
 time_state = 0
@@ -15,7 +14,7 @@ count = 1800
 width = 400
 height = 700
 bg_color = "#fad8d8"
-#current_time = "25:00"
+corner_radius = 15
 
 class Window(QWidget):
     def __init__(self):
@@ -24,6 +23,7 @@ class Window(QWidget):
         self.scaleUI()
         self.updateScale()
         self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint)
+        self.setStyleSheet("border-radius: 10px;")
 
         self.titleBar = Bar(self)
         self.setContentsMargins(0, self.titleBar.height(), 0, 0)
@@ -34,16 +34,13 @@ class Window(QWidget):
     def initUI(self):
         self.setWindowTitle("Tomato Timer")
         self.setGeometry(int(300*scale), int(300*scale), int(width*scale), int(height*scale))
-        self.setStyleSheet("border-radius: 10px;")
         #remove frame
         self.setWindowFlag(Qt.FramelessWindowHint)
         #make the main window transparent
         self.setAttribute(Qt.WA_TranslucentBackground)
         
         self.tomato = QLabel(self)
-        #self.tomato.setPixmap(QPixmap("img/tomato_stem.png"))
         self.title = QLabel(self)
-        #self.time = QLabel("25:00", self)
         self.min_1 = QLabel("", self)
         self.min_2 = QLabel("", self)
         self.dot = QLabel("", self)
@@ -56,7 +53,8 @@ class Window(QWidget):
         self.settings = QPushButton("", self)
         self.rotate = QVariantAnimation(self)
         self.expand = QPropertyAnimation(self, b"size")
-        #self.group = QParallelAnimationGroup(self)
+        self.cutscene = QLabel("", self)
+        self.fade = QPropertyAnimation(self.cutscene, b"geometry")
 
         self.setWindowFlag(Qt.WindowStaysOnTopHint, True)
         
@@ -140,6 +138,7 @@ class Window(QWidget):
         self.reset.setIcon(QIcon("img/reset.png"))
         self.reset.setIconSize(QSize(int(100*adaptive_scale), int(30*adaptive_scale)))
 
+        self.cutscene.setGeometry(int(-328*adaptive_scale), int(19 + 50*adaptive_scale - 10*scale), int(328*adaptive_scale), int(246*adaptive_scale))
         #self.settings.setIcon(QIcon("img/settings.png"))
         #self.settings.setIconSize(QSize(30, 30))
     
@@ -149,9 +148,8 @@ class Window(QWidget):
         self.update()
         #print(rotation)
     
-    def showSettings(self): # Scaling settings
-        global settings_state, rotation
-        print(rotation)
+    def showSettings(self): # expand or collapse settings panel
+        global settings_state
         startpos = self.size()
         self.rotate.stop()
         self.expand.stop()
@@ -171,18 +169,21 @@ class Window(QWidget):
             settings_state = 0
         self.rotate.start()
         self.expand.start()
-        print(self.geometry().height(), newpos.height())
         
     def paintEvent(self, event):
         alen = -1*(count-300)*0.24*16
         qp = QPainter()
         qp.begin(self)
-        qp.drawPixmap(int(200*scale - 75*adaptive_scale), int(19 + 50*adaptive_scale + 50*scale), int(151*adaptive_scale), int(151*adaptive_scale), QPixmap("img/tomato_slice.png"))
-        qp.setBrush(QColor("#fad8d8"))
+        qp.setBrush(QColor(bg_color))
         qp.setPen(Qt.NoPen)
-        qp.drawRoundedRect(QRect(0, 0, self.size().width(), self.size().height()), 10, 10)
-
+        qp.drawRoundedRect(QRect(0, 0, self.size().width(), self.size().height()), corner_radius, corner_radius)
+        
         if(time_state == 0):
+            qp.drawPixmap(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale - 10*scale), int(328*adaptive_scale), int(246*adaptive_scale), QPixmap("img/cutting_board.png"))
+            qp.setOpacity((count-300)/1500)
+            qp.drawPixmap(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale - 10*scale), int(328*adaptive_scale), int(246*adaptive_scale), QPixmap("img/cutting_board_2.png"))
+            qp.setOpacity(1)
+            qp.drawPixmap(int(200*scale - 75*adaptive_scale), int(19 + 50*adaptive_scale + 50*scale), int(150*adaptive_scale), int(150*adaptive_scale), QPixmap("img/tomato_slice.png"))
             tomato_image = QImage("img/tomato_peel.png").scaled(int(150*adaptive_scale), int(150*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation)
             brush = QBrush(tomato_image)
             # Calculate the top-left corner of where the pie will be drawn
@@ -194,13 +195,11 @@ class Window(QWidget):
             brush.setTransform(brush_transformation)
             qp.setBrush(brush)
             qp.setPen(Qt.NoPen)
-        else: # 5 minutes break
-            qp.setBrush(Qt.cyan)
-            qp.setPen(Qt.NoPen)
-        # drawing the timer circle
-        qp.drawPie(QRect(int(200*scale - 75*adaptive_scale), int(20 + 50*adaptive_scale + 50*scale), int(150*adaptive_scale), int(150*adaptive_scale)), 90*16, int(alen))
-        qp.setPen(QPen(QColor("#FF3300"), 3*adaptive_scale))
-        #qp.drawArc(QRect(int(200*scale - 76*adaptive_scale), int(7 + 50*adaptive_scale + 50*scale), int(152*adaptive_scale), int(152*adaptive_scale)), 0, 360*16)
+            qp.drawPie(QRect(int(200*scale - 75*adaptive_scale), int(20 + 50*adaptive_scale + 50*scale), int(150*adaptive_scale), int(150*adaptive_scale)), 90*16, int(alen))
+            qp.setPen(QPen(QColor("#FF3300"), 3*adaptive_scale))
+        """ else: # 5 minutes break
+            qp.drawPixmap(int(200*scale - 75*adaptive_scale), int(19 + 50*adaptive_scale + 50*scale), int(151*adaptive_scale), int(151*adaptive_scale), QPixmap("img/test.png")) """
+
         qp.end()
 
         st = QPainter()
@@ -211,7 +210,6 @@ class Window(QWidget):
         st.end()
 
     def onClick(self): # Always on top checkbox
-        global on_top
         if(self.check.isChecked()):
             self.setWindowFlag(Qt.WindowStaysOnTopHint, True)
             self.show()
@@ -231,14 +229,15 @@ class Window(QWidget):
             timer.stop()
 
     def onResetClick(self): # RESET button
-        global button_state, count, time_state
+        global button_state, count
         self.start.setIcon(QIcon("img/start.png"))
-        timer.stop()
         button_state = 0
         if count <= 300:
-            count = 300
-            time_state = 0
-        rstTimer.start(1)
+            timer.start(1000)
+            count = 1
+            tic()
+        else:
+            rstTimer.start(1)
 
     def onLargeClick(self): # Window scale buttons
         global scale, adaptive_scale
@@ -268,10 +267,10 @@ class Window(QWidget):
         self.Scale()
         
     def onSliderAdjusted(self): # elements scale slider
-        global scale, adaptive_scale
+        global adaptive_scale
         adaptive_scale = self.slider.value() / 10
         self.Scale()
-            
+
     def updateClock(self, M, S):
         self.min_1.setPixmap(QPixmap("img/" + M[0] + ".png").scaled(int(30*adaptive_scale), int(30*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
         self.min_2.setPixmap(QPixmap("img/" + M[1] + ".png").scaled(int(30*adaptive_scale), int(30*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
@@ -279,10 +278,11 @@ class Window(QWidget):
         self.sec_2.setPixmap(QPixmap("img/" + S[1] + ".png").scaled(int(30*adaptive_scale), int(30*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
     
     def calcTime(self): # Time format convter
-        global time_state
         time = count - 300
         m = int(time / 60) + time_state*4
-        if(m < 10):
+        if(m < 0): # for 00:00 to work
+            M = '00'
+        elif(m < 10):
             M = '0' + str(m)
         else:
             M = str(m)
@@ -305,18 +305,30 @@ class Window(QWidget):
         self.updateScale()
         window.update()
 
+    def fade_out(self):
+        self.cutscene.setGeometry(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale - 10*scale), int(328*adaptive_scale), int(246*adaptive_scale))
+        self.cutscene.setPixmap(QPixmap("img/fade_out.png").scaled(int(328*adaptive_scale), int(246*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.fade.setDuration(500)
+        self.fade.setEasingCurve(QEasingCurve.OutQuad)
+        self.fade.setStartValue(QRect(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale - 10*scale), int(328*adaptive_scale), int(246*adaptive_scale)))
+        self.fade.setKeyValueAt(0.2, QRect(int(200*scale - 144*adaptive_scale), int(19 + 50*adaptive_scale - 10*scale), int(328*adaptive_scale), int(246*adaptive_scale)))
+        self.fade.setEndValue(QRect(int(-328*adaptive_scale), int(19 + 50*adaptive_scale - 10*scale), int(328*adaptive_scale), int(246*adaptive_scale)))
+        self.fade.start()
+    
+    def fade_in(self):
+        self.cutscene.setGeometry(int(-328*adaptive_scale), int(19 + 50*adaptive_scale - 10*scale), int(328*adaptive_scale), int(246*adaptive_scale))
+        self.cutscene.setPixmap(QPixmap("img/fade_out.png").scaled(int(328*adaptive_scale), int(246*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.fade.setDuration(500)
+        self.fade.setEasingCurve(QEasingCurve.OutQuad)
+        self.fade.setStartValue(QRect(int(-328*adaptive_scale), int(19 + 50*adaptive_scale - 10*scale), int(328*adaptive_scale), int(246*adaptive_scale)))
+        self.fade.setKeyValueAt(0.8, QRect(int(200*scale - 144*adaptive_scale), int(19 + 50*adaptive_scale - 10*scale), int(328*adaptive_scale), int(246*adaptive_scale)))
+        self.fade.setEndValue(QRect(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale - 10*scale), int(328*adaptive_scale), int(246*adaptive_scale)))
+        self.fade.start()
 class Bar(QWidget):
     clickPos = None
     def __init__(self, parent):
         super().__init__(parent)
         self.setAutoFillBackground(True)
-        
-        """ self.setBackgroundRole(QPalette.Shadow)
-        # alternatively:
-        palette = self.palette()
-        palette.setColor(palette.Window, Qt.black)
-        palette.setColor(palette.WindowText, Qt.white)
-        self.setPalette(palette) """
 
         layout = QHBoxLayout(self)
         layout.setContentsMargins(1, 1, 1, 1)
@@ -336,6 +348,7 @@ class Bar(QWidget):
             btn = QToolButton(self, focusPolicy=Qt.NoFocus)
             layout.addWidget(btn)
             btn.setFixedSize(btn_size)
+            btn.lower()
 
             iconType = getattr(style, 
                 'SP_TitleBar{}Button'.format(target.capitalize()))
@@ -344,9 +357,11 @@ class Bar(QWidget):
             if target == 'close':
                 colorNormal = bg_color
                 colorHover = 'red'
+                radius = corner_radius
             else:
                 colorNormal = bg_color
                 colorHover = '#d6b8b8'
+                radius = 0
             btn.setStyleSheet('''
                 QToolButton {{
                     background-color: {};
@@ -355,8 +370,10 @@ class Bar(QWidget):
                 QToolButton:hover {{
                     background-color: {};
                     border: none;
+                    border-radius: 0px;
+                    border-top-right-radius: {};
                 }}
-            '''.format(colorNormal, colorHover))
+            '''.format(colorNormal, colorHover, radius))
             
 
             signal = getattr(self, target + 'Clicked')
@@ -420,15 +437,20 @@ def tic(): # counter
     window.calcTime()
     if(count == 300):
         time_state = 1
+        window.fade_out()
     elif(count == 0):
+        window.fade_in()
+    elif(count < 0):
         timer.stop()
+        window.cutscene.setGeometry(int(-328*adaptive_scale), int(19 + 50*adaptive_scale - 10*scale), int(328*adaptive_scale), int(246*adaptive_scale))
+        count = 300
+        time_state = 0
         rstTimer.start(1)
     window.update()
 
 def reset(): # Timer reset
-    global count, time_state
+    global count
     if(count >= 1799):
-        print(count)
         count = 1800
         rstTimer.stop()
         if(button_state == 1):
@@ -444,7 +466,6 @@ def rotate():
     if(rotation == 0):
         sTimer.stop()
     window.update()
-
 
 window.calcTime()
 timer = QTimer()
