@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 
-scale = 1.25
+scale = 1.5
 adaptive_scale = 1.5
 QT_SCALE_FACTOR = 3
 button_state = 0
@@ -29,18 +29,22 @@ class Window(QWidget):
         self.setContentsMargins(0, self.titleBar.height(), 0, 0)
 
     def resizeEvent(self, event):
+        global width, height
         self.titleBar.resize(self.width(), self.titleBar.height())
+        #width, height = self.size().width()/scale, self.size().height()/scale
+        self.scaleUI()
     
     def initUI(self):
         self.setWindowTitle("Tomato Timer")
         self.setGeometry(int(300*scale), int(300*scale), int(width*scale), int(height*scale))
         #remove frame
-        self.setWindowFlag(Qt.FramelessWindowHint)
+        #self.setWindowFlag(Qt.FramelessWindowHint)
         #make the main window transparent
         self.setAttribute(Qt.WA_TranslucentBackground)
         
         self.tomato = QLabel(self)
         self.title = QLabel(self)
+        self.timer = QLabel(self)
         self.min_1 = QLabel("", self)
         self.min_2 = QLabel("", self)
         self.dot = QLabel("", self)
@@ -53,6 +57,10 @@ class Window(QWidget):
         self.settings = QPushButton("", self)
         self.rotate = QVariantAnimation(self)
         self.expand = QPropertyAnimation(self, b"size")
+        self.scaleWindow = QVariantAnimation(self)
+        self.scaling = QParallelAnimationGroup(self)
+        self.scaling.addAnimation(self.scaleWindow)
+        self.scaling.addAnimation(self.expand)
         self.cutscene = QLabel("", self)
         self.fade = QPropertyAnimation(self.cutscene, b"geometry")
 
@@ -79,6 +87,10 @@ class Window(QWidget):
         self.expand.setStartValue(height*scale)
         self.expand.setEndValue(height*scale + 200)
 
+        self.scaleWindow.setDuration(500)
+        self.scaleWindow.setEasingCurve(QEasingCurve.OutQuad)
+        self.scaleWindow.valueChanged.connect(self.updateSize)
+        
         self.scaleL = QRadioButton("", self)
         self.scaleM = QRadioButton("", self)
         self.scaleS = QRadioButton("", self)
@@ -100,53 +112,48 @@ class Window(QWidget):
         self.scaleL.setIconSize(QSize(135, 30))
         self.scaleM.setIconSize(QSize(135, 30))
         self.scaleS.setIconSize(QSize(135, 30))
-        self.settings.setGeometry(int(width*scale - 40), int(height*scale - 40), 30, 30)
         
         self.shortcut = QShortcut(QKeySequence("Space"), self)
         self.shortcut.activated.connect(self.onStartClick)
 
     def scaleUI(self):
-        self.setBaseSize(int(width*scale), int(height*scale))
         self.title.setGeometry(int(200*scale - 100*adaptive_scale), 20, int(200*adaptive_scale), int(50*adaptive_scale))
         self.title.setPixmap(QPixmap("img/title.png").scaled(int(200*adaptive_scale), int(50*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
         self.title.setAlignment(Qt.AlignCenter)
 
-        #self.time.setGeometry(int(200*scale - 25*adaptive_scale), int(10 + 200*adaptive_scale + 105*scale), int(50*adaptive_scale), int(25*adaptive_scale))
-        #self.time.setAlignment(Qt.AlignCenter)
-        #self.time.setFont(QFont("Times New Roman", int(10*adaptive_scale)))
-        self.min_1.setGeometry(int(200*scale - 80*adaptive_scale), int(20 + 200*adaptive_scale + 105*scale), int(40*adaptive_scale), int(45*adaptive_scale))
-        self.min_2.setGeometry(int(200*scale - 50*adaptive_scale), int(20 + 200*adaptive_scale + 105*scale), int(40*adaptive_scale), int(45*adaptive_scale))
-        self.dot.setGeometry(int(200*scale - 20*adaptive_scale), int(20 + 200*adaptive_scale + 105*scale), int(40*adaptive_scale), int(40*adaptive_scale))
+        self.timer.setPixmap(QPixmap("img/clock.png").scaled(int(200*adaptive_scale), int(200*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.timer.setGeometry(int(200*scale - 100*adaptive_scale), int(15 + 200*adaptive_scale), int(300*adaptive_scale), int(300*adaptive_scale))
+        self.min_1.setGeometry(int(200*scale - 80*adaptive_scale), int(20 + 220*adaptive_scale + 105*scale), int(40*adaptive_scale), int(45*adaptive_scale))
+        self.min_2.setGeometry(int(200*scale - 50*adaptive_scale), int(20 + 220*adaptive_scale + 105*scale), int(40*adaptive_scale), int(45*adaptive_scale))
+        self.dot.setGeometry(int(200*scale - 20*adaptive_scale), int(20 + 220*adaptive_scale + 105*scale), int(40*adaptive_scale), int(40*adaptive_scale))
         self.dot.setAlignment(Qt.AlignCenter)
         self.dot.setPixmap(QPixmap("img/dot.png").scaled(int(25*adaptive_scale), int(25*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
-        self.sec_1.setGeometry(int(200*scale + 10*adaptive_scale), int(20 + 200*adaptive_scale + 105*scale), int(40*adaptive_scale), int(45*adaptive_scale))
-        self.sec_2.setGeometry(int(200*scale + 40*adaptive_scale), int(20 + 200*adaptive_scale + 105*scale), int(40*adaptive_scale), int(45*adaptive_scale))
+        self.sec_1.setGeometry(int(200*scale + 10*adaptive_scale), int(20 + 220*adaptive_scale + 105*scale), int(40*adaptive_scale), int(45*adaptive_scale))
+        self.sec_2.setGeometry(int(200*scale + 40*adaptive_scale), int(20 + 220*adaptive_scale + 105*scale), int(40*adaptive_scale), int(45*adaptive_scale))
         self.min_1.setAlignment(Qt.AlignCenter)
         self.min_2.setAlignment(Qt.AlignCenter)
         self.sec_1.setAlignment(Qt.AlignCenter)
         self.sec_2.setAlignment(Qt.AlignCenter)
 
+        self.settings.setGeometry(int(width*scale - 40), int(height*scale - 40), 30, 30)
         self.check.setIcon(QIcon("img/on_top.png"))
         self.check.setIconSize(QSize(150, 30))
         self.check.setGeometry(int(200*scale - 75), int(height*scale + 40), 150, 30)
 
-        self.start.setGeometry(int(200*scale - 50*adaptive_scale), int(20 + 225*adaptive_scale + 140*scale), int(100*adaptive_scale), int(30*adaptive_scale))
+        self.start.setGeometry(int(200*scale - 50*adaptive_scale), int(20 + 285*adaptive_scale + 140*scale), int(100*adaptive_scale), int(30*adaptive_scale))
         self.start.setIcon(QIcon("img/start.png"))
         self.start.setIconSize(QSize(int(100*adaptive_scale), int(30*adaptive_scale)))
         
-        self.reset.setGeometry(int(200*scale - 50*adaptive_scale), int(20 + 255*adaptive_scale + 160*scale), int(100*adaptive_scale), int(30*adaptive_scale))
+        self.reset.setGeometry(int(200*scale - 50*adaptive_scale), int(20 + 315*adaptive_scale + 160*scale), int(100*adaptive_scale), int(30*adaptive_scale))
         self.reset.setIcon(QIcon("img/reset.png"))
         self.reset.setIconSize(QSize(int(100*adaptive_scale), int(30*adaptive_scale)))
 
         self.cutscene.setGeometry(int(-328*adaptive_scale), int(19 + 50*adaptive_scale - 10*scale), int(328*adaptive_scale), int(246*adaptive_scale))
-        #self.settings.setIcon(QIcon("img/settings.png"))
-        #self.settings.setIconSize(QSize(30, 30))
     
     def updateIcon(self, value):
         global rotation
         rotation = value
         self.update()
-        #print(rotation)
     
     def showSettings(self): # expand or collapse settings panel
         global settings_state
@@ -241,27 +248,27 @@ class Window(QWidget):
             rstTimer.start(1)
 
     def onLargeClick(self): # Window scale buttons
-        global scale, adaptive_scale
-        scale = 2
-        adaptive_scale = 2
+        self.scaleWindow.setStartValue(adaptive_scale)
+        self.scaleWindow.setEndValue(2.0)
+        print("click", self.scaleWindow.startValue(), 2.0)
         self.scaleL.setChecked(True)
         self.slider.setRange(18, 27)
         self.slider.setValue(20)
         self.Scale()
     
     def onMediumClick(self):
-        global scale, adaptive_scale
-        scale = 1.25
-        adaptive_scale = 1.5
+        self.scaleWindow.setStartValue(adaptive_scale)
+        self.scaleWindow.setEndValue(1.5)
+        print("click ", self.scaleWindow.startValue(), 1.5)
         self.scaleM.setChecked(True)
         self.slider.setRange(12, 18)
         self.slider.setValue(15)
         self.Scale()
 
     def onSmallClick(self):
-        global scale, adaptive_scale
-        scale = 1
-        adaptive_scale = 1
+        self.scaleWindow.setStartValue(adaptive_scale)
+        self.scaleWindow.setEndValue(1.0)
+        print("click ", self.scaleWindow.startValue(), 1.0)
         self.scaleS.setChecked(True)
         self.slider.setRange(10, 13)
         self.slider.setValue(10)
@@ -272,6 +279,15 @@ class Window(QWidget):
         adaptive_scale = self.slider.value() / 10
         self.Scale()
 
+    def updateSize(self, value):
+        global adaptive_scale, scale
+        if value:
+            adaptive_scale = scale = value
+        print("update ", adaptive_scale)
+        self.scaleUI()
+        self.setBaseSize(int(width*scale), int(height*scale))
+        window.update()
+    
     def updateClock(self, M, S):
         self.min_1.setPixmap(QPixmap("img/" + M[0] + ".png").scaled(int(30*adaptive_scale), int(30*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
         self.min_2.setPixmap(QPixmap("img/" + M[1] + ".png").scaled(int(30*adaptive_scale), int(30*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
@@ -302,9 +318,20 @@ class Window(QWidget):
         self.calcTime()
     
     def Scale(self):
-        self.scaleUI()
+        startpos = self.size()
+        if(settings_state == 0):
+            newpos = QSize(int(width*scale), int(height*scale))
+            self.expand.setStartValue(startpos)
+            self.expand.setEndValue(newpos)
+        else:
+            newpos = QSize(int(width*scale), int(height*scale + 200))
+            self.expand.setStartValue(startpos)
+            self.expand.setEndValue(newpos)
+        self.scaleWindow.start()
+        self.expand.start()
         self.updateScale()
         window.update()
+        print("scale")
 
     def fade_out(self):
         self.cutscene.setGeometry(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale - 10*scale), int(328*adaptive_scale), int(246*adaptive_scale))
@@ -376,7 +403,6 @@ class Bar(QWidget):
                 }}
             '''.format(colorNormal, colorHover, radius))
             
-
             signal = getattr(self, target + 'Clicked')
             btn.clicked.connect(signal)
 
