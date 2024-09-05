@@ -7,10 +7,10 @@ scale = 1.5
 adaptive_scale = 1.5
 QT_SCALE_FACTOR = 3
 button_state = 0
-time_state = 0
+time_state = 1
 settings_state = 0
 rotation = 0
-count = 1800
+count = 1
 width = 400
 height = 700
 bg_color = "#fad8d8"
@@ -37,8 +37,6 @@ class Window(QWidget):
     def initUI(self):
         self.setWindowTitle("Tomato Timer")
         self.setGeometry(int(300*scale), int(300*scale), int(width*scale), int(height*scale))
-        #remove frame
-        #self.setWindowFlag(Qt.FramelessWindowHint)
         #make the main window transparent
         self.setAttribute(Qt.WA_TranslucentBackground)
         
@@ -186,15 +184,15 @@ class Window(QWidget):
         qp.drawRoundedRect(QRect(0, 0, self.size().width(), self.size().height()), corner_radius, corner_radius)
         
         if(time_state == 0):
-            qp.drawPixmap(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale - 10*scale), int(328*adaptive_scale), int(246*adaptive_scale), QPixmap("img/cutting_board.png"))
+            qp.drawPixmap(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(328*adaptive_scale), int(246*adaptive_scale), QPixmap("img/cutting_board.png"))
             qp.setOpacity((count-300)/1500)
-            qp.drawPixmap(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale - 10*scale), int(328*adaptive_scale), int(246*adaptive_scale), QPixmap("img/cutting_board_2.png"))
+            qp.drawPixmap(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(328*adaptive_scale), int(246*adaptive_scale), QPixmap("img/cutting_board_2.png"))
             qp.setOpacity(1)
-            qp.drawPixmap(int(200*scale - 75*adaptive_scale), int(19 + 50*adaptive_scale + 50*scale), int(150*adaptive_scale), int(150*adaptive_scale), QPixmap("img/tomato_slice.png"))
+            qp.drawPixmap(int(200*scale - 76*adaptive_scale), int(19 + 50*adaptive_scale + 50*scale), int(150*adaptive_scale), int(150*adaptive_scale), QPixmap("img/tomato_slice.png"))
             tomato_image = QImage("img/tomato_peel.png").scaled(int(150*adaptive_scale), int(150*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation)
             brush = QBrush(tomato_image)
             # Calculate the top-left corner of where the pie will be drawn
-            pie_x = int(200*scale - 75*adaptive_scale)
+            pie_x = int(200*scale - 76*adaptive_scale)
             pie_y = int(20 + 50*adaptive_scale + 50*scale)
             # Adjust the brush transformation
             brush_transformation = QTransform()
@@ -202,7 +200,7 @@ class Window(QWidget):
             brush.setTransform(brush_transformation)
             qp.setBrush(brush)
             qp.setPen(Qt.NoPen)
-            qp.drawPie(QRect(int(200*scale - 75*adaptive_scale), int(20 + 50*adaptive_scale + 50*scale), int(150*adaptive_scale), int(150*adaptive_scale)), 90*16, int(alen))
+            qp.drawPie(QRect(int(200*scale - 76*adaptive_scale), int(19 + 50*adaptive_scale + 50*scale), int(150*adaptive_scale), int(150*adaptive_scale)), 90*16, int(alen))
             qp.setPen(QPen(QColor("#FF3300"), 3*adaptive_scale))
         """ else: # 5 minutes break
             qp.drawPixmap(int(200*scale - 75*adaptive_scale), int(19 + 50*adaptive_scale + 50*scale), int(151*adaptive_scale), int(151*adaptive_scale), QPixmap("img/test.png")) """
@@ -250,42 +248,39 @@ class Window(QWidget):
     def onLargeClick(self): # Window scale buttons
         self.scaleWindow.setStartValue(adaptive_scale)
         self.scaleWindow.setEndValue(2.0)
-        print("click", self.scaleWindow.startValue(), 2.0)
         self.scaleL.setChecked(True)
         self.slider.setRange(18, 27)
         self.slider.setValue(20)
-        self.Scale()
+        self.Scale(2.0)
     
     def onMediumClick(self):
         self.scaleWindow.setStartValue(adaptive_scale)
         self.scaleWindow.setEndValue(1.5)
-        print("click ", self.scaleWindow.startValue(), 1.5)
         self.scaleM.setChecked(True)
         self.slider.setRange(12, 18)
         self.slider.setValue(15)
-        self.Scale()
+        self.Scale(1.5)
 
     def onSmallClick(self):
         self.scaleWindow.setStartValue(adaptive_scale)
         self.scaleWindow.setEndValue(1.0)
-        print("click ", self.scaleWindow.startValue(), 1.0)
         self.scaleS.setChecked(True)
         self.slider.setRange(10, 13)
         self.slider.setValue(10)
-        self.Scale()
+        self.Scale(1.0)
         
     def onSliderAdjusted(self): # elements scale slider
         global adaptive_scale
         adaptive_scale = self.slider.value() / 10
-        self.Scale()
+        self.Scale(adaptive_scale)
 
     def updateSize(self, value):
         global adaptive_scale, scale
         if value:
             adaptive_scale = scale = value
-        print("update ", adaptive_scale)
-        self.scaleUI()
         self.setBaseSize(int(width*scale), int(height*scale))
+        self.scaleUI()
+        self.updateScale()
         window.update()
     
     def updateClock(self, M, S):
@@ -317,40 +312,36 @@ class Window(QWidget):
         self.slider.setGeometry(int(200*scale - 100), int(height*scale + 120), 200, 30)
         self.calcTime()
     
-    def Scale(self):
+    def Scale(self, new_scale):
         startpos = self.size()
         if(settings_state == 0):
-            newpos = QSize(int(width*scale), int(height*scale))
+            newpos = QSize(int(width*new_scale), int(height*new_scale))
             self.expand.setStartValue(startpos)
             self.expand.setEndValue(newpos)
         else:
-            newpos = QSize(int(width*scale), int(height*scale + 200))
+            newpos = QSize(int(width*new_scale), int(height*new_scale + 200))
             self.expand.setStartValue(startpos)
             self.expand.setEndValue(newpos)
-        self.scaleWindow.start()
-        self.expand.start()
-        self.updateScale()
-        window.update()
-        print("scale")
+        self.scaling.start()
 
     def fade_out(self):
-        self.cutscene.setGeometry(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale - 10*scale), int(328*adaptive_scale), int(246*adaptive_scale))
+        self.cutscene.setGeometry(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(328*adaptive_scale), int(246*adaptive_scale))
         self.cutscene.setPixmap(QPixmap("img/fade_out.png").scaled(int(328*adaptive_scale), int(246*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
         self.fade.setDuration(500)
         self.fade.setEasingCurve(QEasingCurve.OutQuad)
-        self.fade.setStartValue(QRect(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale - 10*scale), int(328*adaptive_scale), int(246*adaptive_scale)))
-        self.fade.setKeyValueAt(0.2, QRect(int(200*scale - 144*adaptive_scale), int(19 + 50*adaptive_scale - 10*scale), int(328*adaptive_scale), int(246*adaptive_scale)))
-        self.fade.setEndValue(QRect(int(-328*adaptive_scale), int(19 + 50*adaptive_scale - 10*scale), int(328*adaptive_scale), int(246*adaptive_scale)))
+        self.fade.setStartValue(QRect(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(328*adaptive_scale), int(246*adaptive_scale)))
+        self.fade.setKeyValueAt(0.2, QRect(int(200*scale - 144*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(328*adaptive_scale), int(246*adaptive_scale)))
+        self.fade.setEndValue(QRect(int(-328*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(328*adaptive_scale), int(246*adaptive_scale)))
         self.fade.start()
     
     def fade_in(self):
-        self.cutscene.setGeometry(int(-328*adaptive_scale), int(19 + 50*adaptive_scale - 10*scale), int(328*adaptive_scale), int(246*adaptive_scale))
-        self.cutscene.setPixmap(QPixmap("img/fade_out.png").scaled(int(328*adaptive_scale), int(246*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.cutscene.setGeometry(int(-328*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(328*adaptive_scale), int(246*adaptive_scale))
+        self.cutscene.setPixmap(QPixmap("img/fade_in.png").scaled(int(328*adaptive_scale), int(246*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
         self.fade.setDuration(500)
         self.fade.setEasingCurve(QEasingCurve.OutQuad)
-        self.fade.setStartValue(QRect(int(-328*adaptive_scale), int(19 + 50*adaptive_scale - 10*scale), int(328*adaptive_scale), int(246*adaptive_scale)))
-        self.fade.setKeyValueAt(0.8, QRect(int(200*scale - 144*adaptive_scale), int(19 + 50*adaptive_scale - 10*scale), int(328*adaptive_scale), int(246*adaptive_scale)))
-        self.fade.setEndValue(QRect(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale - 10*scale), int(328*adaptive_scale), int(246*adaptive_scale)))
+        self.fade.setStartValue(QRect(int(-328*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(328*adaptive_scale), int(246*adaptive_scale)))
+        self.fade.setKeyValueAt(0.8, QRect(int(200*scale - 144*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(328*adaptive_scale), int(246*adaptive_scale)))
+        self.fade.setEndValue(QRect(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(328*adaptive_scale), int(246*adaptive_scale)))
         self.fade.start()
 class Bar(QWidget):
     clickPos = None
@@ -470,7 +461,7 @@ def tic(): # counter
     elif(count < 0):
         timer.stop()
         window.cutscene.setGeometry(int(-328*adaptive_scale), int(19 + 50*adaptive_scale - 10*scale), int(328*adaptive_scale), int(246*adaptive_scale))
-        count = 300
+        count = 1800
         time_state = 0
         rstTimer.start(1)
     window.update()
