@@ -203,11 +203,11 @@ class Window(QWidget):
             qp.setPen(Qt.NoPen)
             qp.drawPie(QRect(int(200*scale - 76*adaptive_scale), int(19 + 50*adaptive_scale + 50*scale), int(150*adaptive_scale), int(150*adaptive_scale)), 90*16, int(alen))
             qp.setPen(QPen(QColor("#FF3300"), 3*adaptive_scale))
-        else: # 5 minutes break
-            qp.drawPixmap(int(200*scale - 150*adaptive_scale), int(19 + 50*adaptive_scale + 50*scale), int(300*adaptive_scale), int(170*adaptive_scale), QPixmap("img/sink_back.png"))
+        elif(time_state == 1): # 5 minutes break
+            qp.drawPixmap(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale + 50*scale), int(328*adaptive_scale), int(170*adaptive_scale), QPixmap("img/sink_back.png"))
             filename = "img/water/R_frame" + str(frame) + ".png"
-            qp.drawPixmap(int(200*scale - 135*adaptive_scale), int(19 + 50*adaptive_scale + 50*scale), int(270*adaptive_scale), int(160*adaptive_scale), QPixmap(filename))
-            qp.drawPixmap(int(200*scale - 150*adaptive_scale), int(19 + 50*adaptive_scale + 50*scale), int(300*adaptive_scale), int(170*adaptive_scale), QPixmap("img/sink_front.png"))
+            qp.drawPixmap(int(200*scale - 135*adaptive_scale), int(19 + 50*adaptive_scale + 50*scale), int(274*adaptive_scale), int(160*adaptive_scale), QPixmap(filename))
+            qp.drawPixmap(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale + 50*scale), int(328*adaptive_scale), int(170*adaptive_scale), QPixmap("img/sink_front.png"))
 
         qp.end()
 
@@ -332,23 +332,25 @@ class Window(QWidget):
         self.scaling.start()
 
     def fade_out(self):
-        self.cutscene.setGeometry(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(328*adaptive_scale), int(246*adaptive_scale))
-        self.cutscene.setPixmap(QPixmap("img/fade_out.png").scaled(int(328*adaptive_scale), int(246*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.cutscene.show()
+        self.cutscene.setGeometry(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(692*adaptive_scale), int(246*adaptive_scale))
+        self.cutscene.setPixmap(QPixmap("img/fade_out.png").scaled(int(692*adaptive_scale), int(246*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
         self.fade.setDuration(500)
         self.fade.setEasingCurve(QEasingCurve.OutQuad)
-        self.fade.setStartValue(QRect(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(328*adaptive_scale), int(246*adaptive_scale)))
-        self.fade.setKeyValueAt(0.2, QRect(int(200*scale - 144*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(328*adaptive_scale), int(246*adaptive_scale)))
-        self.fade.setEndValue(QRect(int(-328*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(328*adaptive_scale), int(246*adaptive_scale)))
+        self.fade.setStartValue(QRect(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(692*adaptive_scale), int(246*adaptive_scale)))
+        self.fade.setKeyValueAt(0.2, QRect(int(200*scale - 144*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(692*adaptive_scale), int(246*adaptive_scale)))
+        self.fade.setEndValue(QRect(int(-328*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(692*adaptive_scale), int(246*adaptive_scale)))
         self.fade.start()
     
     def fade_in(self):
-        self.cutscene.setGeometry(int(-328*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(328*adaptive_scale), int(246*adaptive_scale))
-        self.cutscene.setPixmap(QPixmap("img/fade_in.png").scaled(int(328*adaptive_scale), int(246*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
-        self.fade.setDuration(500)
+        self.cutscene.show()
+        self.cutscene.setGeometry(int(-328*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(692*adaptive_scale), int(246*adaptive_scale))
+        self.cutscene.setPixmap(QPixmap("img/fade_in.png").scaled(int(692*adaptive_scale), int(246*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.fade.setDuration(800)
         self.fade.setEasingCurve(QEasingCurve.OutQuad)
-        self.fade.setStartValue(QRect(int(-328*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(328*adaptive_scale), int(246*adaptive_scale)))
-        self.fade.setKeyValueAt(0.8, QRect(int(200*scale - 144*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(328*adaptive_scale), int(246*adaptive_scale)))
-        self.fade.setEndValue(QRect(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(328*adaptive_scale), int(246*adaptive_scale)))
+        self.fade.setStartValue(QRect(int(-328*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(692*adaptive_scale), int(246*adaptive_scale)))
+        self.fade.setKeyValueAt(0.8, QRect(int(200*scale - 144*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(692*adaptive_scale), int(246*adaptive_scale)))
+        self.fade.setEndValue(QRect(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(692*adaptive_scale), int(246*adaptive_scale)))
         self.fade.start()
 class Bar(QWidget):
     clickPos = None
@@ -461,15 +463,21 @@ def tic(): # counter
     count -= 1
     window.calcTime()
     if(count == 300):
-        time_state = 1
+        time_state = -1
         window.fade_out()
+    elif(count == 299):
+        window.cutscene.hide()
+        time_state = 1
         aniTimer.start(42)
+
     elif(count == 0):
+        time_state = -1
         aniTimer.stop()
         window.fade_in()
     elif(count < 0):
         timer.stop()
-        window.cutscene.setGeometry(int(-328*adaptive_scale), int(19 + 50*adaptive_scale - 10*scale), int(328*adaptive_scale), int(246*adaptive_scale))
+        window.cutscene.setGeometry(int(-328*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(692*adaptive_scale), int(246*adaptive_scale))
+        window.cutscene.hide()
         count = 1800
         time_state = 0
         rstTimer.start(1)
