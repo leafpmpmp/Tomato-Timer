@@ -3,8 +3,9 @@ A simple tomato timer, now with a new UI under construction. (No ETA, but hopefu
 ## Requirements
 Python
 ```
-pip install python
+winget install python
 ```
+or get it from python.org (or Microsoft store on Windows)
 PyQt5
 ```
 pip install PyQt5
