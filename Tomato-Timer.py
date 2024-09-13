@@ -7,10 +7,11 @@ scale = 1.5
 adaptive_scale = 1.5
 QT_SCALE_FACTOR = 3
 button_state = 0
-time_state = 1
+time_state = 0
 settings_state = 0
 rotation = 0
-count = 1
+count = 301
+frame = 0
 width = 400
 height = 700
 bg_color = "#fad8d8"
@@ -202,8 +203,11 @@ class Window(QWidget):
             qp.setPen(Qt.NoPen)
             qp.drawPie(QRect(int(200*scale - 76*adaptive_scale), int(19 + 50*adaptive_scale + 50*scale), int(150*adaptive_scale), int(150*adaptive_scale)), 90*16, int(alen))
             qp.setPen(QPen(QColor("#FF3300"), 3*adaptive_scale))
-        """ else: # 5 minutes break
-            qp.drawPixmap(int(200*scale - 75*adaptive_scale), int(19 + 50*adaptive_scale + 50*scale), int(151*adaptive_scale), int(151*adaptive_scale), QPixmap("img/test.png")) """
+        else: # 5 minutes break
+            qp.drawPixmap(int(200*scale - 150*adaptive_scale), int(19 + 50*adaptive_scale + 50*scale), int(300*adaptive_scale), int(170*adaptive_scale), QPixmap("img/sink_back.png"))
+            filename = "img/water/R_frame" + str(frame) + ".png"
+            qp.drawPixmap(int(200*scale - 135*adaptive_scale), int(19 + 50*adaptive_scale + 50*scale), int(270*adaptive_scale), int(160*adaptive_scale), QPixmap(filename))
+            qp.drawPixmap(int(200*scale - 150*adaptive_scale), int(19 + 50*adaptive_scale + 50*scale), int(300*adaptive_scale), int(170*adaptive_scale), QPixmap("img/sink_front.png"))
 
         qp.end()
 
@@ -228,10 +232,13 @@ class Window(QWidget):
             self.start.setIcon(QIcon("img/stop.png"))
             button_state = 1
             timer.start(1000)
+            if time_state == 1:
+                aniTimer.start(42)
         else:
             self.start.setIcon(QIcon("img/start.png"))
             button_state = 0
             timer.stop()
+            aniTimer.stop()
 
     def onResetClick(self): # RESET button
         global button_state, count
@@ -456,7 +463,9 @@ def tic(): # counter
     if(count == 300):
         time_state = 1
         window.fade_out()
+        aniTimer.start(42)
     elif(count == 0):
+        aniTimer.stop()
         window.fade_in()
     elif(count < 0):
         timer.stop()
@@ -485,6 +494,13 @@ def rotate():
         sTimer.stop()
     window.update()
 
+def animation():
+    global frame
+    frame += 1
+    frame %= 40
+    window.update()
+    
+
 window.calcTime()
 timer = QTimer()
 timer.timeout.connect(tic)
@@ -494,6 +510,9 @@ rstTimer.timeout.connect(reset)
 
 sTimer = QTimer()
 sTimer.timeout.connect(rotate)
+
+aniTimer = QTimer()
+aniTimer.timeout.connect(animation)
 
 T = QThread()
 T.run = timer
