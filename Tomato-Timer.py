@@ -204,10 +204,10 @@ class Window(QWidget):
             qp.drawPie(QRect(int(200*scale - 76*adaptive_scale), int(19 + 50*adaptive_scale + 50*scale), int(150*adaptive_scale), int(150*adaptive_scale)), 90*16, int(alen))
             qp.setPen(QPen(QColor("#FF3300"), 3*adaptive_scale))
         elif(time_state == 1): # 5 minutes break
-            qp.drawPixmap(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale + 50*scale), int(328*adaptive_scale), int(170*adaptive_scale), QPixmap("img/sink_back.png"))
+            qp.drawPixmap(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale + 45*scale), int(328*adaptive_scale), int(192*adaptive_scale), QPixmap("img/sink_back.png"))
             filename = "img/water/R_frame" + str(frame) + ".png"
-            qp.drawPixmap(int(200*scale - 135*adaptive_scale), int(19 + 50*adaptive_scale + 50*scale), int(274*adaptive_scale), int(160*adaptive_scale), QPixmap(filename))
-            qp.drawPixmap(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale + 50*scale), int(328*adaptive_scale), int(170*adaptive_scale), QPixmap("img/sink_front.png"))
+            qp.drawPixmap(int(200*scale - 135*adaptive_scale), int(19 + 50*adaptive_scale + 45*scale), int(274*adaptive_scale), int(180*adaptive_scale), QPixmap(filename))
+            qp.drawPixmap(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale + 45*scale), int(328*adaptive_scale), int(192*adaptive_scale), QPixmap("img/sink_front.png"))
 
         qp.end()
 
