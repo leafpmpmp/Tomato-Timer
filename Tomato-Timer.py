@@ -16,6 +16,7 @@ width = 400
 height = 700
 bg_color = "#fad8d8"
 corner_radius = 15
+figure = 1
 
 class Window(QWidget):
     def __init__(self):
@@ -84,15 +85,20 @@ class Window(QWidget):
         self.expand.setDuration(500)
         self.expand.setEasingCurve(QEasingCurve.OutQuad)
         self.expand.setStartValue(height*scale)
-        self.expand.setEndValue(height*scale + 200)
+        self.expand.setEndValue(height*scale + 240)
 
         self.scaleWindow.setDuration(500)
         self.scaleWindow.setEasingCurve(QEasingCurve.OutQuad)
         self.scaleWindow.valueChanged.connect(self.updateSize)
         
+        self.scale = QLabel("", self)
         self.scaleL = QRadioButton("", self)
         self.scaleM = QRadioButton("", self)
         self.scaleS = QRadioButton("", self)
+        self.scalegroup = QButtonGroup(self)
+        self.scalegroup.addButton(self.scaleL)
+        self.scalegroup.addButton(self.scaleM)
+        self.scalegroup.addButton(self.scaleS)
         self.slider = QSlider(self)
         self.scaleM.setChecked(True)
         self.slider.setRange(12, 18)
@@ -111,6 +117,19 @@ class Window(QWidget):
         self.scaleL.setIconSize(QSize(135, 30))
         self.scaleM.setIconSize(QSize(135, 30))
         self.scaleS.setIconSize(QSize(135, 30))
+
+        self.fig = QLabel("", self)
+        self.figtomato = QRadioButton("", self)
+        self.figapple = QRadioButton("", self)
+        self.figapple.clicked.connect(self.onAppleCheck)
+        self.figtomato.clicked.connect(self.onTomatoCheck)
+        self.figtomato.setIcon(QIcon("img/tomato.png"))
+        self.figapple.setIcon(QIcon("img/apple.png"))
+        self.figtomato.setIconSize(QSize(36, 36))
+        self.figapple.setIconSize(QSize(36, 42))
+        self.figtomato.setChecked(True)
+        self.figtomato.setStyleSheet('QCheckBox::indicator {background: transparent; border: 1px solid #c73030} QCheckBox::indicator:checked {background: transparent; background-color: #c73030}')
+        self.figapple.setStyleSheet('QCheckBox::indicator {background: transparent; border: 1px solid #c73030} QCheckBox::indicator:checked {background: transparent; background-color: #c73030}')
         
         self.shortcut = QShortcut(QKeySequence("Space"), self)
         self.shortcut.activated.connect(self.onStartClick)
@@ -160,7 +179,7 @@ class Window(QWidget):
         self.rotate.stop()
         self.expand.stop()
         if(settings_state == 0):
-            newpos = QSize(int(width*scale), int(height*scale + 200))
+            newpos = QSize(int(width*scale), int(height*scale + 240))
             self.expand.setStartValue(startpos)
             self.expand.setEndValue(newpos)
             self.rotate.setStartValue(rotation)
@@ -185,24 +204,42 @@ class Window(QWidget):
         qp.drawRoundedRect(QRect(0, 0, self.size().width(), self.size().height()), corner_radius, corner_radius)
         
         if(time_state == 0):
-            qp.drawPixmap(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(328*adaptive_scale), int(246*adaptive_scale), QPixmap("img/cutting_board.png"))
-            qp.setOpacity((count-300)/1500)
-            qp.drawPixmap(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(328*adaptive_scale), int(246*adaptive_scale), QPixmap("img/cutting_board_2.png"))
-            qp.setOpacity(1)
-            qp.drawPixmap(int(200*scale - 76*adaptive_scale), int(19 + 50*adaptive_scale + 50*scale), int(150*adaptive_scale), int(150*adaptive_scale), QPixmap("img/tomato_slice.png"))
-            tomato_image = QImage("img/tomato_peel.png").scaled(int(150*adaptive_scale), int(150*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation)
-            brush = QBrush(tomato_image)
-            # Calculate the top-left corner of where the pie will be drawn
-            pie_x = int(200*scale - 76*adaptive_scale)
-            pie_y = int(20 + 50*adaptive_scale + 50*scale)
-            # Adjust the brush transformation
-            brush_transformation = QTransform()
-            brush_transformation.translate(pie_x, pie_y)
-            brush.setTransform(brush_transformation)
-            qp.setBrush(brush)
-            qp.setPen(Qt.NoPen)
-            qp.drawPie(QRect(int(200*scale - 76*adaptive_scale), int(19 + 50*adaptive_scale + 50*scale), int(150*adaptive_scale), int(150*adaptive_scale)), 90*16, int(alen))
-            qp.setPen(QPen(QColor("#FF3300"), 3*adaptive_scale))
+            if figure == 1: # tomato
+                qp.drawPixmap(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(328*adaptive_scale), int(246*adaptive_scale), QPixmap("img/cutting_board_1.png"))
+                qp.setOpacity((count-300)/1500)
+                qp.drawPixmap(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(328*adaptive_scale), int(246*adaptive_scale), QPixmap("img/tomato_shade.png"))
+                qp.setOpacity(1)
+                tomato_image = QImage("img/tomato.png").scaled(int(150*adaptive_scale), int(150*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                brush = QBrush(tomato_image)
+                # Calculate the top-left corner of where the pie will be drawn
+                pie_x = int(200*scale - 76*adaptive_scale)
+                pie_y = int(20 + 50*adaptive_scale + 50*scale)
+                # Adjust the brush transformation
+                brush_transformation = QTransform()
+                brush_transformation.translate(pie_x, pie_y)
+                brush.setTransform(brush_transformation)
+                qp.setBrush(brush)
+                qp.setPen(Qt.NoPen)
+                qp.drawPie(QRect(int(200*scale - 76*adaptive_scale), int(19 + 50*adaptive_scale + 50*scale), int(150*adaptive_scale), int(150*adaptive_scale)), 90*16, int(alen))
+                qp.setPen(QPen(QColor("#FF3300"), 3*adaptive_scale))
+            elif figure == 2: # bad apple
+                qp.drawPixmap(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(328*adaptive_scale), int(246*adaptive_scale), QPixmap("img/cutting_board_2.png"))
+                qp.setOpacity((count-300)/1500)
+                qp.drawPixmap(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(328*adaptive_scale), int(246*adaptive_scale), QPixmap("img/apple_shade.png"))
+                qp.setOpacity(1)
+                apple_image = QImage("img/apple.png").scaled(int(152*adaptive_scale), int(180*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                brush = QBrush(apple_image)
+                # Calculate the top-left corner of where the pie will be drawn
+                pie_x = int(200*scale - 77*adaptive_scale)
+                pie_y = int(19 + 32*adaptive_scale + 50*scale)
+                # Adjust the brush transformation
+                brush_transformation = QTransform()
+                brush_transformation.translate(pie_x, pie_y)
+                brush.setTransform(brush_transformation)
+                qp.setBrush(brush)
+                qp.setPen(Qt.NoPen)
+                qp.drawPie(QRect(int(200*scale - 77*adaptive_scale), int(19 + 32*adaptive_scale + 50*scale), int(152*adaptive_scale), int(180*adaptive_scale)), 90*16, int(alen))
+                qp.setPen(QPen(QColor("#FF3300"), 3*adaptive_scale))
         elif(time_state == 1): # 5 minutes break
             qp.drawPixmap(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale + 45*scale), int(328*adaptive_scale), int(192*adaptive_scale), QPixmap("img/sink_back.png"))
             filename = "img/water/R_frame" + str(frame) + ".png"
@@ -281,6 +318,16 @@ class Window(QWidget):
         adaptive_scale = self.slider.value() / 10
         self.Scale(adaptive_scale)
 
+    def onAppleCheck(self):
+        global figure
+        figure = 2
+        window.update
+    
+    def onTomatoCheck(self):
+        global figure
+        figure = 1
+        window.update
+    
     def updateSize(self, value):
         global adaptive_scale, scale
         if value:
@@ -317,6 +364,8 @@ class Window(QWidget):
         self.scaleM.setGeometry(int(200*scale - 45), int(height*scale + 80), 135, 30)
         self.scaleS.setGeometry(int(200*scale + 90), int(height*scale + 80), 135, 30)
         self.slider.setGeometry(int(200*scale - 100), int(height*scale + 120), 200, 30)
+        self.figtomato.setGeometry(int(200*scale - 150), int(height*scale + 160), 135, 42)
+        self.figapple.setGeometry(int(200*scale + 60), int(height*scale + 160), 135, 42)
         self.calcTime()
     
     def Scale(self, new_scale):
@@ -326,7 +375,7 @@ class Window(QWidget):
             self.expand.setStartValue(startpos)
             self.expand.setEndValue(newpos)
         else:
-            newpos = QSize(int(width*new_scale), int(height*new_scale + 200))
+            newpos = QSize(int(width*new_scale), int(height*new_scale + 240))
             self.expand.setStartValue(startpos)
             self.expand.setEndValue(newpos)
         self.scaling.start()
@@ -334,7 +383,7 @@ class Window(QWidget):
     def fade_out(self):
         self.cutscene.show()
         self.cutscene.setGeometry(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(692*adaptive_scale), int(246*adaptive_scale))
-        self.cutscene.setPixmap(QPixmap("img/fade_out.png").scaled(int(692*adaptive_scale), int(246*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.cutscene.setPixmap(QPixmap("img/fade_out_" + str(figure) +".png").scaled(int(692*adaptive_scale), int(246*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
         self.fade.setDuration(500)
         self.fade.setEasingCurve(QEasingCurve.OutQuad)
         self.fade.setStartValue(QRect(int(200*scale - 164*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(692*adaptive_scale), int(246*adaptive_scale)))
@@ -345,7 +394,7 @@ class Window(QWidget):
     def fade_in(self):
         self.cutscene.show()
         self.cutscene.setGeometry(int(-328*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(692*adaptive_scale), int(246*adaptive_scale))
-        self.cutscene.setPixmap(QPixmap("img/fade_in.png").scaled(int(692*adaptive_scale), int(246*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.cutscene.setPixmap(QPixmap("img/fade_in_" + str(figure) +".png").scaled(int(692*adaptive_scale), int(246*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
         self.fade.setDuration(800)
         self.fade.setEasingCurve(QEasingCurve.OutQuad)
         self.fade.setStartValue(QRect(int(-328*adaptive_scale), int(19 + 50*adaptive_scale + 5*scale), int(692*adaptive_scale), int(246*adaptive_scale)))
