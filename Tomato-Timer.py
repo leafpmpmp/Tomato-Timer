@@ -1,4 +1,4 @@
-import sys
+import sys, os
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -20,6 +20,11 @@ bg_hover = "#c1b19d"
 corner_radius = 15
 figure = 1
 
+def get_path(filename):
+    if hasattr(sys, "_MEIPASS"):
+        return os.path.join(sys._MEIPASS, filename)
+    else:
+        return filename
 class Window(QWidget):
     def __init__(self):
         super().__init__()
@@ -90,7 +95,7 @@ class Window(QWidget):
                     background-color: #34488c;
                 }}
             '''.format(5*scale))
-        self.start.setIcon(QIcon("img/start.png"))
+        self.start.setIcon(QIcon(get_path("img/start.png")))
         self.reset.setStyleSheet('''
                 QPushButton {{
                     background-color: #FF8343;
@@ -104,9 +109,9 @@ class Window(QWidget):
                     background-color: #c46435;
                 }}
             '''.format(5*scale))
-        self.reset.setIcon(QIcon("img/reset.png"))
+        self.reset.setIcon(QIcon(get_path("img/reset.png")))
         self.check.setStyleSheet('QCheckBox::indicator {background: transparent; border: 1px solid #00CC66} QCheckBox::indicator:checked {background: transparent; background-color: #00CC66}')
-        self.check.setIcon(QIcon("img/on_top.png"))
+        self.check.setIcon(QIcon(get_path("img/on_top.png")))
         self.settings.setStyleSheet('QPushButton {background-color: transparent; border: none}')
 
         self.start.clicked.connect(self.onStartClick)
@@ -148,15 +153,15 @@ class Window(QWidget):
         self.slider.setOrientation(1)
         self.slider.setTickPosition(2)
         self.slider.setTickInterval(1)
-        self.slider.setValue(15)
+        self.slider.setValue(int(15*factor))
         self.scaleL.clicked.connect(self.onLargeClick)
         self.scaleM.clicked.connect(self.onMediumClick)
         self.scaleS.clicked.connect(self.onSmallClick)
         self.slider.valueChanged.connect(self.onSliderAdjusted)
 
-        self.scaleL.setIcon(QIcon("img/large.png"))
-        self.scaleM.setIcon(QIcon("img/medium.png"))
-        self.scaleS.setIcon(QIcon("img/small.png"))
+        self.scaleL.setIcon(QIcon(get_path("img/large.png")))
+        self.scaleM.setIcon(QIcon(get_path("img/medium.png")))
+        self.scaleS.setIcon(QIcon(get_path("img/small.png")))
         self.scaleL.setIconSize(QSize(40*scale, 10*scale))
         self.scaleM.setIconSize(QSize(40*scale, 10*scale))
         self.scaleS.setIconSize(QSize(40*scale, 10*scale))
@@ -166,8 +171,8 @@ class Window(QWidget):
         self.figapple = QRadioButton("", self)
         self.figapple.clicked.connect(self.onAppleCheck)
         self.figtomato.clicked.connect(self.onTomatoCheck)
-        self.figtomato.setIcon(QIcon("img/tomato.png"))
-        self.figapple.setIcon(QIcon("img/apple.png"))
+        self.figtomato.setIcon(QIcon(get_path("img/tomato.png")))
+        self.figapple.setIcon(QIcon(get_path("img/apple.png")))
         self.figtomato.setIconSize(QSize(int(18*factor), int(18*factor)))
         self.figapple.setIconSize(QSize(int(18*factor), int(21*factor)))
         self.figtomato.setChecked(True)
@@ -179,16 +184,16 @@ class Window(QWidget):
 
     def scaleUI(self):
         self.title.setGeometry(int(half_width*scale - 50*adaptive_scale), 10*factor, int(100*adaptive_scale), int(25*adaptive_scale))
-        self.title.setPixmap(QPixmap("img/title.png").scaled(int(100*adaptive_scale), int(25*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.title.setPixmap(QPixmap(get_path("img/title.png")).scaled(int(100*adaptive_scale), int(25*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
         self.title.setAlignment(Qt.AlignCenter)
 
-        self.timer.setPixmap(QPixmap("img/clock.png").scaled(int(100*adaptive_scale), int(100*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.timer.setPixmap(QPixmap(get_path("img/clock.png")).scaled(int(100*adaptive_scale), int(100*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
         self.timer.setGeometry(int(half_width*scale - 50*adaptive_scale), int(5*factor + 50*adaptive_scale + 68.5*scale), int(150*adaptive_scale), int(150*adaptive_scale))
         self.min_1.setGeometry(int(half_width*scale - 45*adaptive_scale), int(10*factor + 111*adaptive_scale + 68.5*scale), int(10*adaptive_scale + 10*scale), int(22.5*adaptive_scale))
         self.min_2.setGeometry(int(half_width*scale - 25*adaptive_scale), int(10*factor + 111*adaptive_scale + 68.5*scale), int(10*adaptive_scale + 10*scale), int(22.5*adaptive_scale))
         self.dot.setGeometry(int(half_width*scale - 10*adaptive_scale), int(12*factor + 111*adaptive_scale + 68.5*scale), int(10*adaptive_scale + 10*scale), int(20*adaptive_scale))
         self.dot.setAlignment(Qt.AlignCenter)
-        self.dot.setPixmap(QPixmap("img/dot.png").scaled(int(25*adaptive_scale), int(25*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.dot.setPixmap(QPixmap(get_path("img/dot.png")).scaled(int(25*adaptive_scale), int(25*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
         self.sec_1.setGeometry(int(half_width*scale + 5*adaptive_scale), int(10*factor + 111*adaptive_scale + 68.5*scale), int(10*adaptive_scale + 10*scale), int(22.5*adaptive_scale))
         self.sec_2.setGeometry(int(half_width*scale + 25*adaptive_scale), int(10*factor + 111*adaptive_scale + 68.5*scale), int(10*adaptive_scale + 10*scale), int(22.5*adaptive_scale))
         self.min_1.setAlignment(Qt.AlignCenter)
@@ -252,11 +257,11 @@ class Window(QWidget):
         
         if(time_state == 0):
             if figure == 1: # tomato
-                qp.drawPixmap(int(half_width*scale - 82*adaptive_scale), int(25*factor + 25*adaptive_scale + 2.5*scale), int(164*adaptive_scale), int(123*adaptive_scale), QPixmap("img/cutting_board_1.png"))
+                qp.drawPixmap(int(half_width*scale - 82*adaptive_scale), int(25*factor + 25*adaptive_scale + 2.5*scale), int(164*adaptive_scale), int(123*adaptive_scale), QPixmap(get_path("img/cutting_board_1.png")))
                 qp.setOpacity((count-300)/1500)
-                qp.drawPixmap(int(half_width*scale - 82*adaptive_scale), int(25*factor + 25*adaptive_scale + 2.5*scale), int(164*adaptive_scale), int(123*adaptive_scale), QPixmap("img/tomato_shade.png"))
+                qp.drawPixmap(int(half_width*scale - 82*adaptive_scale), int(25*factor + 25*adaptive_scale + 2.5*scale), int(164*adaptive_scale), int(123*adaptive_scale), QPixmap(get_path("img/tomato_shade.png")))
                 qp.setOpacity(1)
-                tomato_image = QImage("img/tomato.png").scaled(int(75*adaptive_scale), int(75*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                tomato_image = QImage(get_path("img/tomato.png")).scaled(int(75*adaptive_scale), int(75*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation)
                 brush = QBrush(tomato_image)
                 # Calculate the top-left corner of where the pie will be drawn
                 pie_x = int(half_width*scale - 38*adaptive_scale)
@@ -270,11 +275,11 @@ class Window(QWidget):
                 qp.drawPie(QRect(int(half_width*scale - 38*adaptive_scale), int(25*factor + 47.5*adaptive_scale + 2.5*scale), int(75*adaptive_scale), int(75*adaptive_scale)), 90*16, int(alen))
                 qp.setPen(QPen(QColor("#FF3300"), 3*adaptive_scale))
             elif figure == 2: # bad apple
-                qp.drawPixmap(int(half_width*scale - 82*adaptive_scale), int(25*factor + 25*adaptive_scale + 2.5*scale), int(164*adaptive_scale), int(123*adaptive_scale), QPixmap("img/cutting_board_2.png"))
+                qp.drawPixmap(int(half_width*scale - 82*adaptive_scale), int(25*factor + 25*adaptive_scale + 2.5*scale), int(164*adaptive_scale), int(123*adaptive_scale), QPixmap(get_path("img/cutting_board_2.png")))
                 qp.setOpacity((count-300)/1500)
-                qp.drawPixmap(int(half_width*scale - 82*adaptive_scale), int(25*factor + 25*adaptive_scale + 2.5*scale), int(164*adaptive_scale), int(123*adaptive_scale), QPixmap("img/apple_shade.png"))
+                qp.drawPixmap(int(half_width*scale - 82*adaptive_scale), int(25*factor + 25*adaptive_scale + 2.5*scale), int(164*adaptive_scale), int(123*adaptive_scale), QPixmap(get_path("img/apple_shade.png")))
                 qp.setOpacity(1)
-                apple_image = QImage("img/apple.png").scaled(int(76*adaptive_scale), int(90*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                apple_image = QImage(get_path("img/apple.png")).scaled(int(76*adaptive_scale), int(90*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation)
                 brush = QBrush(apple_image)
                 # Calculate the top-left corner of where the pie will be drawn
                 pie_x = int(half_width*scale - 38.5*adaptive_scale)
@@ -288,11 +293,11 @@ class Window(QWidget):
                 qp.drawPie(QRect(int(half_width*scale - 38.5*adaptive_scale), int(25*factor + 38.5*adaptive_scale + 2.5*scale), int(76*adaptive_scale), int(90*adaptive_scale)), 90*16, int(alen))
                 qp.setPen(QPen(QColor("#FF3300"), 3*adaptive_scale))
         elif(time_state == 1): # 5 minutes break
-            qp.drawPixmap(int(half_width*scale - 82*adaptive_scale), int(25*factor+ 25*adaptive_scale + 22.5*scale), int(164*adaptive_scale), int(96*adaptive_scale), QPixmap("img/sink_back.png"))
+            qp.drawPixmap(int(half_width*scale - 82*adaptive_scale), int(25*factor+ 25*adaptive_scale + 22.5*scale), int(164*adaptive_scale), int(96*adaptive_scale), QPixmap(get_path("img/sink_back.png")))
             filename = "img/water/R_frame" + str(frame) + ".png"
-            qp.drawPixmap(int(half_width*scale - 67.5*adaptive_scale), int(25*factor+ 25*adaptive_scale + 22.5*scale), int(137*adaptive_scale), int(90*adaptive_scale), QPixmap(filename))
-            qp.drawPixmap(int(half_width*scale - 82*adaptive_scale), int(25*factor+ 25*adaptive_scale + 22.5*scale), int(164*adaptive_scale), int(96*adaptive_scale), QPixmap("img/sink_front.png"))
-            qp.drawPixmap(int(half_width*scale - 25*adaptive_scale), int(25*factor + 5*adaptive_scale + 4.5*scale), int(37.5*adaptive_scale), int(45*adaptive_scale), QPixmap("img/faucet.png"))
+            qp.drawPixmap(int(half_width*scale - 67.5*adaptive_scale), int(25*factor+ 25*adaptive_scale + 22.5*scale), int(137*adaptive_scale), int(90*adaptive_scale), QPixmap(get_path(filename)))
+            qp.drawPixmap(int(half_width*scale - 82*adaptive_scale), int(25*factor+ 25*adaptive_scale + 22.5*scale), int(164*adaptive_scale), int(96*adaptive_scale), QPixmap(get_path("img/sink_front.png")))
+            qp.drawPixmap(int(half_width*scale - 25*adaptive_scale), int(25*factor + 5*adaptive_scale + 4.5*scale), int(37.5*adaptive_scale), int(45*adaptive_scale), QPixmap(get_path("img/faucet.png")))
 
         qp.end()
 
@@ -300,7 +305,7 @@ class Window(QWidget):
         st.begin(self)
         st.translate(int(width*scale - 12.5*factor), int(height*scale - 12.5*factor))
         st.rotate(rotation)
-        st.drawPixmap(-7.5*factor, -7.5*factor, 15*factor, 15*factor, QPixmap("img/settings.png").scaled(15*factor, 15*factor, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        st.drawPixmap(-7.5*factor, -7.5*factor, 15*factor, 15*factor, QPixmap(get_path("img/settings.png")).scaled(15*factor, 15*factor, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         st.end()
 
     def onClick(self): # Always on top checkbox
@@ -314,7 +319,7 @@ class Window(QWidget):
     def onStartClick(self): # START/STOP button
         global button_state
         if(button_state == 0):
-            self.start.setIcon(QIcon("img/stop.png"))
+            self.start.setIcon(QIcon(get_path("img/stop.png")))
             self.start.setStyleSheet('''
                 QPushButton {{
                     background-color: #179BAE;
@@ -333,7 +338,7 @@ class Window(QWidget):
             if time_state == 1:
                 aniTimer.start(42)
         else:
-            self.start.setIcon(QIcon("img/start.png"))
+            self.start.setIcon(QIcon(get_path("img/start.png")))
             self.start.setStyleSheet('''
                 QPushButton {{
                     background-color: #4b63b3;;
@@ -353,7 +358,7 @@ class Window(QWidget):
 
     def onResetClick(self): # RESET button
         global button_state, count
-        self.start.setIcon(QIcon("img/start.png"))
+        self.start.setIcon(QIcon(get_path("img/start.png")))
         self.start.setStyleSheet('''
                 QPushButton {{
                     background-color: #4b63b3;;
@@ -427,10 +432,10 @@ class Window(QWidget):
         window.update()
     
     def updateClock(self, M, S):
-        self.min_1.setPixmap(QPixmap("img/" + M[0] + ".png").scaled(int(15*adaptive_scale), int(20*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
-        self.min_2.setPixmap(QPixmap("img/" + M[1] + ".png").scaled(int(15*adaptive_scale), int(20*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
-        self.sec_1.setPixmap(QPixmap("img/" + S[0] + ".png").scaled(int(15*adaptive_scale), int(20*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
-        self.sec_2.setPixmap(QPixmap("img/" + S[1] + ".png").scaled(int(15*adaptive_scale), int(20*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.min_1.setPixmap(QPixmap(get_path("img/" + M[0] + ".png")).scaled(int(15*adaptive_scale), int(20*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.min_2.setPixmap(QPixmap(get_path("img/" + M[1] + ".png")).scaled(int(15*adaptive_scale), int(20*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.sec_1.setPixmap(QPixmap(get_path("img/" + S[0] + ".png")).scaled(int(15*adaptive_scale), int(20*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.sec_2.setPixmap(QPixmap(get_path("img/" + S[1] + ".png")).scaled(int(15*adaptive_scale), int(20*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
         self.scaleUI()
     
     def calcTime(self): # Time format convter
@@ -473,7 +478,7 @@ class Window(QWidget):
     def fade_out(self):
         self.cutscene.show()
         self.cutscene.setGeometry(int(half_width*scale - 82*adaptive_scale), int(25*factor + 25*adaptive_scale + 2.5*scale), int(346*adaptive_scale), int(123*adaptive_scale))
-        self.cutscene.setPixmap(QPixmap("img/fade_out_" + str(figure) +".png").scaled(int(346*adaptive_scale), int(123*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.cutscene.setPixmap(QPixmap(get_path("img/fade_out_" + str(figure) +".png")).scaled(int(346*adaptive_scale), int(123*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
         self.fade.setDuration(500)
         self.fade.setEasingCurve(QEasingCurve.OutQuad)
         self.fade.setStartValue(QRect(int(half_width*scale - 82*adaptive_scale), int(25*factor + 25*adaptive_scale + 2.5*scale), int(346*adaptive_scale), int(123*adaptive_scale)))
@@ -484,7 +489,7 @@ class Window(QWidget):
     def fade_in(self):
         self.cutscene.show()
         self.cutscene.setGeometry(int(-164*adaptive_scale), int(25*factor + 25*adaptive_scale + 2.5*scale), int(346*adaptive_scale), int(123*adaptive_scale))
-        self.cutscene.setPixmap(QPixmap("img/fade_in_" + str(figure) +".png").scaled(int(346*adaptive_scale), int(123*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.cutscene.setPixmap(QPixmap(get_path("img/fade_in_" + str(figure) +".png")).scaled(int(346*adaptive_scale), int(123*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
         self.fade.setDuration(800)
         self.fade.setEasingCurve(QEasingCurve.OutQuad)
         self.fade.setStartValue(QRect(int(-164*adaptive_scale), int(25*factor + 25*adaptive_scale + 2.5*scale), int(346*adaptive_scale), int(123*adaptive_scale)))
