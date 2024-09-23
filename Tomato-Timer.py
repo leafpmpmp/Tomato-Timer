@@ -17,6 +17,7 @@ half_width = width / 2
 height = 350
 bg_color = "#F1DEC6"
 bg_hover = "#c1b19d"
+st_color = "#c73030"
 corner_radius = 15
 figure = 1
 
@@ -30,6 +31,7 @@ class Window(QWidget):
         super().__init__()
         screen = self.screen()
         size = screen.size()
+        print(size.width(), size.height())
         global width, height, scale, factor, adaptive_scale, corner_radius
         factor = size.height() / 1080
         scale = scale * factor
@@ -110,8 +112,9 @@ class Window(QWidget):
                 }}
             '''.format(5*scale))
         self.reset.setIcon(QIcon(get_path("img/reset.png")))
-        self.check.setStyleSheet('QCheckBox::indicator {background: transparent; border: 1px solid #00CC66} QCheckBox::indicator:checked {background: transparent; background-color: #00CC66}')
+        self.check.setStyleSheet('QCheckBox::indicator {{background: transparent; border: 1px solid #7eb055; width: {}; height: {}}} QCheckBox::indicator:checked {{background: transparent; background-color: #7eb055}}'.format(10*scale, 10*scale))
         self.check.setIcon(QIcon(get_path("img/on_top.png")))
+        self.check.setIconSize(QSize(int(40*factor), int(20*factor)))
         self.settings.setStyleSheet('QPushButton {background-color: transparent; border: none}')
 
         self.start.clicked.connect(self.onStartClick)
@@ -154,6 +157,20 @@ class Window(QWidget):
         self.slider.setTickPosition(2)
         self.slider.setTickInterval(1)
         self.slider.setValue(int(15*factor))
+        self.slider.setStyleSheet('''QSlider::groove:horizontal {{
+                                    border: 1px solid #4b63b3;
+                                    height: {};
+                                    background: #4b63b3;
+                                    margin: 0px;
+                                    border-radius: {};
+                                    }}
+                                    QSlider::handle:horizontal {{
+                                    background: #FF8343;
+                                    border: 1px solid #FF8343;
+                                    width: {};
+                                    height: {};
+                                    border-radius: {};
+                                    }}'''.format(10*factor, 5*factor, 12*factor, 8*factor, 4*factor))
         self.scaleL.clicked.connect(self.onLargeClick)
         self.scaleM.clicked.connect(self.onMediumClick)
         self.scaleS.clicked.connect(self.onSmallClick)
@@ -162,9 +179,42 @@ class Window(QWidget):
         self.scaleL.setIcon(QIcon(get_path("img/large.png")))
         self.scaleM.setIcon(QIcon(get_path("img/medium.png")))
         self.scaleS.setIcon(QIcon(get_path("img/small.png")))
-        self.scaleL.setIconSize(QSize(40*scale, 10*scale))
-        self.scaleM.setIconSize(QSize(40*scale, 10*scale))
-        self.scaleS.setIconSize(QSize(40*scale, 10*scale))
+        self.scaleL.setIconSize(QSize(int(40*factor), int(20*factor)))
+        self.scaleM.setIconSize(QSize(int(40*factor), int(20*factor)))
+        self.scaleS.setIconSize(QSize(int(40*factor), int(20*factor)))
+        self.scaleL.setStyleSheet('''QRadioButton::indicator {{
+                                  background: transparent; 
+                                  border: 1px solid #353637; 
+                                  width: {}; 
+                                  height: {};
+                                  }} 
+                                  QRadioButton::indicator:checked {{
+                                  background: transparent; 
+                                  background-color: #353637;
+                                  }}
+                                  '''.format(10*scale, 10*scale))
+        self.scaleM.setStyleSheet('''QRadioButton::indicator {{
+                                  background: transparent; 
+                                  border: 1px solid #353637; 
+                                  width: {}; 
+                                  height: {};
+                                  }} 
+                                  QRadioButton::indicator:checked {{
+                                  background: transparent; 
+                                  background-color: #353637;
+                                  }}
+                                  '''.format(10*scale, 10*scale))
+        self.scaleS.setStyleSheet('''QRadioButton::indicator {{
+                                  background: transparent; 
+                                  border: 1px solid #353637; 
+                                  width: {}; 
+                                  height: {};
+                                  }} 
+                                  QRadioButton::indicator:checked {{
+                                  background: transparent; 
+                                  background-color: #353637;
+                                  }}
+                                  '''.format(10*scale, 10*scale))
 
         self.fig = QLabel("", self)
         self.figtomato = QRadioButton("", self)
@@ -176,14 +226,14 @@ class Window(QWidget):
         self.figtomato.setIconSize(QSize(int(18*factor), int(18*factor)))
         self.figapple.setIconSize(QSize(int(18*factor), int(21*factor)))
         self.figtomato.setChecked(True)
-        self.figtomato.setStyleSheet('QCheckBox::indicator {background: transparent; border: 1px solid #c73030} QCheckBox::indicator:checked {background: transparent; background-color: #c73030}')
-        self.figapple.setStyleSheet('QCheckBox::indicator {background: transparent; border: 1px solid #c73030} QCheckBox::indicator:checked {background: transparent; background-color: #c73030}')
+        self.figtomato.setStyleSheet('QRadioButton::indicator {{background: transparent; border: 1px solid #c73030; width: {}; height: {}}} QRadioButton::indicator:checked {{background: transparent; background-color: #c73030}}'.format(10*scale, 10*scale))
+        self.figapple.setStyleSheet('QRadioButton::indicator {{background: transparent; border: 1px solid #c73030; width: {}; height: {}}} QRadioButton::indicator:checked {{background: transparent; background-color: #c73030}}'.format(10*scale, 10*scale))
         
         self.shortcut = QShortcut(QKeySequence("Space"), self)
         self.shortcut.activated.connect(self.onStartClick)
 
     def scaleUI(self):
-        self.title.setGeometry(int(half_width*scale - 50*adaptive_scale), 10*factor, int(100*adaptive_scale), int(25*adaptive_scale))
+        self.title.setGeometry(int(half_width*scale - 50*adaptive_scale), 30*factor, int(100*adaptive_scale), int(25*adaptive_scale))
         self.title.setPixmap(QPixmap(get_path("img/title.png")).scaled(int(100*adaptive_scale), int(25*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
         self.title.setAlignment(Qt.AlignCenter)
 
@@ -201,9 +251,8 @@ class Window(QWidget):
         self.sec_1.setAlignment(Qt.AlignCenter)
         self.sec_2.setAlignment(Qt.AlignCenter)
 
-        self.settings.setGeometry(int(width*scale - 20*factor), int(height*scale - 20*factor), 15*factor, 15*factor)
-        self.check.setIconSize(QSize(75*factor, 15*factor))
-        self.check.setGeometry(int(half_width*scale - 37.5*factor), int(height*scale + 20*factor), 75*factor, 15*factor)
+        self.settings.setGeometry(int(width*scale - 20*factor), int(height*scale - 20*factor), int(15*factor), int(15*factor))
+        self.check.setGeometry(int(half_width*scale - 27.5*factor), int(height*scale + 10*factor), int(67.5*factor), int(20*factor))
 
         self.start.setGeometry(int(half_width*scale - 37.5*adaptive_scale), int(10*factor + 147.5*adaptive_scale + 75*scale), int(75*adaptive_scale), int(22.5*adaptive_scale))
         self.start.setIconSize(QSize(int(75*adaptive_scale), int(22.5*adaptive_scale)))
@@ -305,7 +354,7 @@ class Window(QWidget):
         st.begin(self)
         st.translate(int(width*scale - 12.5*factor), int(height*scale - 12.5*factor))
         st.rotate(rotation)
-        st.drawPixmap(-7.5*factor, -7.5*factor, 15*factor, 15*factor, QPixmap(get_path("img/settings.png")).scaled(15*factor, 15*factor, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        st.drawPixmap(int(-7.5*factor), int(-7.5*factor), int(15*factor), int(15*factor), QPixmap(get_path("img/settings.png")).scaled(int(15*factor), int(15*factor), Qt.KeepAspectRatio, Qt.SmoothTransformation))
         st.end()
 
     def onClick(self): # Always on top checkbox
@@ -322,15 +371,15 @@ class Window(QWidget):
             self.start.setIcon(QIcon(get_path("img/stop.png")))
             self.start.setStyleSheet('''
                 QPushButton {{
-                    background-color: #179BAE;
+                    background-color: #da4a4a;
                     border: none;
                     border-radius: {};
                 }}
                 QPushButton:hover {{
-                    background-color: #158a9c;
+                    background-color: #c73030;
                 }}
                 QPushButton:pressed {{
-                    background-color: #137382;
+                    background-color: #b52323;
                 }}
             '''.format(5*scale))
             button_state = 1
@@ -361,7 +410,7 @@ class Window(QWidget):
         self.start.setIcon(QIcon(get_path("img/start.png")))
         self.start.setStyleSheet('''
                 QPushButton {{
-                    background-color: #4b63b3;;
+                    background-color: #4b63b3;
                     border: none;
                     border-radius: {};
                 }}
@@ -385,7 +434,7 @@ class Window(QWidget):
         self.scaleWindow.setStartValue(adaptive_scale)
         self.scaleWindow.setEndValue(2.0*factor)
         self.scaleL.setChecked(True)
-        self.slider.setRange(int(18*factor), int(27*factor))
+        self.slider.setRange(int(18*factor), int(24*factor))
         self.slider.setValue(int(20*factor))
         self.Scale(2.0*factor)
     
@@ -401,7 +450,7 @@ class Window(QWidget):
         self.scaleWindow.setStartValue(adaptive_scale)
         self.scaleWindow.setEndValue(1.0*factor)
         self.scaleS.setChecked(True)
-        self.slider.setRange(int(10*factor), int(13*factor))
+        self.slider.setRange(int(10*factor), int(12*factor))
         self.slider.setValue(int(10*factor))
         self.Scale(1.0*factor)
         
@@ -455,12 +504,12 @@ class Window(QWidget):
         self.updateClock(M, S)
 
     def updateScale(self):
-        self.scaleL.setGeometry(int(half_width*scale - 90*factor), int(height*scale + 40*factor), int(67.5*factor), int(15*factor))
-        self.scaleM.setGeometry(int(half_width*scale - 22.5*factor), int(height*scale + 40*factor), int(67.5*factor), int(15*factor))
-        self.scaleS.setGeometry(int(half_width*scale + 45*factor), int(height*scale + 40*factor), int(67.5*factor), int(15*factor))
-        self.slider.setGeometry(int(half_width*scale - 50*factor), int(height*scale + 60*factor), int(100*factor), int(15*factor))
-        self.figtomato.setGeometry(int(half_width*scale -75*factor), int(height*scale + 80*factor), int(67.5*factor), int(21*factor))
-        self.figapple.setGeometry(int(half_width*scale + 30*factor), int(height*scale + 80*factor), int(67.5*factor), int(21*factor))
+        self.scaleL.setGeometry(int(half_width*scale - 95*factor), int(height*scale + 40*factor), int(67.5*factor), int(20*factor))
+        self.scaleM.setGeometry(int(half_width*scale - 27.5*factor), int(height*scale + 40*factor), int(67.5*factor), int(20*factor))
+        self.scaleS.setGeometry(int(half_width*scale + 40*factor), int(height*scale + 40*factor), int(67.5*factor), int(20*factor))
+        self.slider.setGeometry(int(half_width*scale - 50*factor), int(height*scale + 70*factor), int(100*factor), int(20*factor))
+        self.figtomato.setGeometry(int(half_width*scale -75*factor), int(height*scale + 90*factor), int(67.5*factor), int(21*factor))
+        self.figapple.setGeometry(int(half_width*scale + 30*factor), int(height*scale + 90*factor), int(67.5*factor), int(21*factor))
         self.calcTime()
     
     def Scale(self, new_scale):
@@ -512,7 +561,7 @@ class Bar(QWidget):
 
         style = self.style()
         ref_size = self.fontMetrics().height()
-        ref_size += style.pixelMetric(style.PM_ButtonMargin) * 2
+        ref_size += style.pixelMetric(style.PM_ButtonMargin)*1.2
         self.setMaximumHeight(ref_size + 2)
 
         btn_size = QSize(ref_size, ref_size)
@@ -528,7 +577,7 @@ class Bar(QWidget):
 
             if target == 'close':
                 colorNormal = bg_color
-                colorHover = 'red'
+                colorHover = '#c73030'
                 radius = corner_radius
             else:
                 colorNormal = bg_color
@@ -592,7 +641,10 @@ class Bar(QWidget):
         self.title.resize(self.minButton.x(), self.height())
         self.updateTitle()
 
+QT_SCALE_FACTOR=0
 app = QApplication(sys.argv)
+app.setAttribute(Qt.AA_DisableHighDpiScaling, True)
+app.setAttribute(Qt.AA_UseHighDpiPixmaps, False)
 window = Window()
 window.setWindowFlag(Qt.WindowStaysOnTopHint)
 window.show()
