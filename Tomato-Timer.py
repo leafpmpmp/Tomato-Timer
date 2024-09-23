@@ -31,12 +31,11 @@ class Window(QWidget):
         super().__init__()
         screen = self.screen()
         size = screen.size()
-        print(size.width(), size.height())
+        #print(size.width(), size.height())
         global width, height, scale, factor, adaptive_scale, corner_radius
         factor = size.height() / 1080
         scale = scale * factor
         adaptive_scale = adaptive_scale * factor
-        print(scale, factor)
         
         self.initUI()
         self.scaleUI()
@@ -233,7 +232,7 @@ class Window(QWidget):
         self.shortcut.activated.connect(self.onStartClick)
 
     def scaleUI(self):
-        self.title.setGeometry(int(half_width*scale - 50*adaptive_scale), 30*factor, int(100*adaptive_scale), int(25*adaptive_scale))
+        self.title.setGeometry(int(half_width*scale - 50*adaptive_scale), int(30*factor), int(100*adaptive_scale), int(25*adaptive_scale))
         self.title.setPixmap(QPixmap(get_path("img/title.png")).scaled(int(100*adaptive_scale), int(25*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
         self.title.setAlignment(Qt.AlignCenter)
 
@@ -562,6 +561,7 @@ class Bar(QWidget):
         style = self.style()
         ref_size = self.fontMetrics().height()
         ref_size += style.pixelMetric(style.PM_ButtonMargin)*1.2
+        ref_size = int(ref_size)
         self.setMaximumHeight(ref_size + 2)
 
         btn_size = QSize(ref_size, ref_size)
@@ -643,8 +643,6 @@ class Bar(QWidget):
 
 QT_SCALE_FACTOR=0
 app = QApplication(sys.argv)
-app.setAttribute(Qt.AA_DisableHighDpiScaling, True)
-app.setAttribute(Qt.AA_UseHighDpiPixmaps, False)
 window = Window()
 window.setWindowFlag(Qt.WindowStaysOnTopHint)
 window.show()
