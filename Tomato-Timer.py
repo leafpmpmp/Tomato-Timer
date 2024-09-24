@@ -10,7 +10,7 @@ button_state = 0
 time_state = 0
 settings_state = 0
 rotation = 0
-count = 1800
+count = 302
 frame = 0
 width = 200
 half_width = width / 2
@@ -80,6 +80,7 @@ class Window(QWidget):
         self.scaling.addAnimation(self.expand)
         self.cutscene = QLabel("", self)
         self.fade = QPropertyAnimation(self.cutscene, b"geometry")
+        self.fade.valueChanged.connect(self.fade_faucet)
 
         self.setWindowFlag(Qt.WindowStaysOnTopHint, True)
         
@@ -230,9 +231,10 @@ class Window(QWidget):
         
         self.shortcut = QShortcut(QKeySequence("Space"), self)
         self.shortcut.activated.connect(self.onStartClick)
+        self.faucet = QLabel("", self)
 
     def scaleUI(self):
-        self.title.setGeometry(int(half_width*scale - 50*adaptive_scale), int(30*factor), int(100*adaptive_scale), int(25*adaptive_scale))
+        self.title.setGeometry(int(half_width*scale - 50*adaptive_scale), int(15*factor), int(100*adaptive_scale), int(25*adaptive_scale))
         self.title.setPixmap(QPixmap(get_path("img/title.png")).scaled(int(100*adaptive_scale), int(25*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
         self.title.setAlignment(Qt.AlignCenter)
 
@@ -260,6 +262,8 @@ class Window(QWidget):
         self.reset.setIconSize(QSize(int(75*adaptive_scale), int(22.5*adaptive_scale)))
 
         self.cutscene.setGeometry(int(-164*adaptive_scale), int(10*factor + 25*adaptive_scale - 5*scale), int(164*adaptive_scale), int(123*adaptive_scale))
+        self.faucet.setGeometry(int(width*scale + 39*adaptive_scale), int(25*factor + 5*adaptive_scale + 4.5*scale), int(37.5*adaptive_scale), int(45*adaptive_scale))
+        self.faucet.setPixmap(QPixmap(get_path("img/faucet.png")).scaled(int(37.5*adaptive_scale), int(45*adaptive_scale), Qt.KeepAspectRatio, Qt.SmoothTransformation))
     
     def updateIcon(self, value):
         global rotation
@@ -523,6 +527,10 @@ class Window(QWidget):
             self.expand.setEndValue(newpos)
         self.scaling.start()
 
+    def fade_faucet(self, value):
+        x = value.x()
+        self.faucet.setGeometry(int(x + width*scale + 39*adaptive_scale), int(25*factor + 5*adaptive_scale + 4.5*scale), int(37.5*adaptive_scale), int(45*adaptive_scale))
+
     def fade_out(self):
         self.cutscene.show()
         self.cutscene.setGeometry(int(half_width*scale - 82*adaptive_scale), int(25*factor + 25*adaptive_scale + 2.5*scale), int(346*adaptive_scale), int(123*adaptive_scale))
@@ -661,6 +669,7 @@ def tic(): # counter
     elif(count == 299):
         window.cutscene.hide()
         time_state = 1
+        window.calcTime()
         aniTimer.start(42)
 
     elif(count == 0):
